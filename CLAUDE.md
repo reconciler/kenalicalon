@@ -66,7 +66,7 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
   jaringan luar, 0 error konsol.
 - Perubahan tampilan: sebut bahwa tampilan berubah (aturan 11); cek visual di perangkat nyata oleh Amal.
 
-## Keputusan terbuka (menunggu Auditor/Amal, per 22 Okt 2026)
+## Keputusan terbuka (per 22 Okt 2026; arahan Auditor sudah tercatat di `AUDIT-HANDOFF-2026-10-22-auditor.md`, PIC memperbarui bagian ini saat mengeksekusi)
 
 1. **Kontras kicker** (`.band .kicker`, amber `#E0A458` di atas pita fase): 2,77:1 sampai 4,79:1 di 8 warna pita, gagal
    4,5:1 di 7 dari 8. Usulan: `#F3DBBC` (amber dicampur putih 60%), minimum 4,52:1 di semua pita.
@@ -95,16 +95,13 @@ Proyek lain; tanpa tautan kode sumber/GitHub dan tanpa deskripsi singkat; tinggi
 - Jadwal Kajian: https://reconciler.github.io/jadwalkajian/
 - Catatan Kajian: https://reconciler.github.io/catatankajian/
 - Bikin CV Taaruf: https://reconciler.github.io/bikin-cv-taaruf/
-- Kenali Calon: https://reconciler.github.io/kenalicalon/ (ditambahkan PIC 22 Okt 2026; menunggu verifikasi Auditor)
+- Kenali Calon: https://reconciler.github.io/kenalicalon/ (diverifikasi Auditor 22 Okt 2026)
 
-Footer repo ini menampilkan proyek lain (Jadwal Kajian, Catatan Kajian, Bikin CV Taaruf), bukan dirinya sendiri.
+Panel "Tentang" repo ini (arahan Auditor 22 Okt 2026, lihat `AUDIT-HANDOFF-2026-10-22-auditor.md`) menampilkan proyek lain (Jadwal Kajian, Catatan Kajian, Bikin CV Taaruf), bukan dirinya sendiri.
 
-*Dua bagian berikut adalah salinan ke-4 dari `catatankajian` (22 Okt 2026), byte-identik; judulnya masih menyebut tiga
-repo, Auditor yang menyatukan daftar repo itu.*
+## Aturan lintas-repo (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf, kenalicalon)
 
-## Aturan lintas-repo (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf)
-
-Ditetapkan/dikonfirmasi Amal 3 Okt 2026 (butir 14-19: 5 Okt 2026). **Ubah serentak di ketiga repo (dijaga Auditor); jangan hanya satu.**
+Ditetapkan/dikonfirmasi Amal 3 Okt 2026 (butir 14-19: 5 Okt 2026; cakupan keempat repo: 22 Okt 2026). **Ubah serentak di keempat repo (dijaga Auditor); jangan hanya satu.**
 
 1. **Keputusan tanpa dampak tampilan atau fungsi** diambil sendiri oleh sesi kerja dan dicatat; jangan menunggu Amal.
    Perubahan tampilan, fungsi, privasi, hosting/pipeline terbit, atau penghapusan data tetap perlu konfirmasi Amal.
@@ -120,7 +117,7 @@ Ditetapkan/dikonfirmasi Amal 3 Okt 2026 (butir 14-19: 5 Okt 2026). **Ubah serent
    memuat skrip dari CDN tanpa SRI.
 8. **Klaim harus benar** untuk proyek itu: dokumen, UI, meta tag, dan data terstruktur tidak boleh mengklaim hal yang tidak
    ada (mis. `SearchAction` tanpa fungsinya; "tidak ada data terkirim" bila Google Fonts dimuat).
-9. **Simetri:** perubahan cara komunikasi, pelaporan, atau struktur koordinasi diterapkan serentak di ketiga repo.
+9. **Simetri:** perubahan cara komunikasi, pelaporan, atau struktur koordinasi diterapkan serentak di keempat repo.
 10. **Kebersihan berkas:** hapus berkas koordinasi yang tidak lagi relevan; pertahankan yang masih atau akan dipakai.
 11. **Verifikasi tampilan:** uji otomatis tidak menilai tampilan, dan sesi kerja tidak bisa membuka `reconciler.github.io`.
     Cek visual di perangkat nyata dilakukan Amal; **dianggap tidak bermasalah sampai Amal melapor** (keputusan 5 Okt 2026):
@@ -138,7 +135,7 @@ Ditetapkan/dikonfirmasi Amal 3 Okt 2026 (butir 14-19: 5 Okt 2026). **Ubah serent
 19. **Praktik uji** (bukan aturan keras): uji deterministik (data beku, jam terkunci); simulasikan skrip workflow lokal
     (jalur sukses + gagal) sebelum push; UI: screenshot 320/375/430 px, font asli, jaringan luar diblokir.
 
-## Preferensi melapor (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf)
+## Preferensi melapor (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf, kenalicalon)
 
 Berlaku untuk laporan, handoff, dan chat. Ditetapkan Amal 5 Okt 2026.
 
@@ -152,6 +149,38 @@ Berlaku untuk laporan, handoff, dan chat. Ditetapkan Amal 5 Okt 2026.
 - Akhiri pekerjaan besar dengan "yang perlu diketahui": belum terbukti, perubahan perilaku, kejadian otomatis, keputusan
   yang menunggu.
 
+## Proyek terkait dan sinkronisasi (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf, kenalicalon)
+
+Ditetapkan Amal 22 Okt 2026 (proyek baru Kenali Calon; Auditor mengorkestrasi). Sesi kerja = PIC repo itu. Sesi bisa
+berganti, jadi pegangannya git (`CLAUDE.md` + `AUDIT-HANDOFF-*.md`), bukan ID sesi.
+
+| Proyek | Fungsi | URL | Kunci penyimpanan |
+|---|---|---|---|
+| Jadwal Kajian | Jadwal kajian Jabodetabek | https://reconciler.github.io/jadwalkajian/ | tidak ada |
+| Catatan Kajian | Arsip catatan sesi kajian | https://reconciler.github.io/catatankajian/ | tidak ada |
+| Bikin CV Taaruf | Pembuat CV ta'aruf (PDF) | https://reconciler.github.io/bikin-cv-taaruf/ | `ctgv1_draft_v1`, `ctgv1_noreport` |
+| Kenali Calon | Panduan pertanyaan ta'aruf | https://reconciler.github.io/kenalicalon/ | `kenalicalon_v1` |
+
+**Yang harus sinkron:**
+
+| Hal | Pemilik | Kapan |
+|---|---|---|
+| Daftar resmi (nama + URL) di keempat `CLAUDE.md` | Auditor | proyek baru atau URL berubah |
+| Bagian bersama `CLAUDE.md` (Aturan lintas-repo, Preferensi melapor, bagian ini): diff identik | Auditor | tiap perubahan |
+| "Proyek lain" di panel "Tentang" tiap `index.html` (bikin: konstanta `ABOUT`) = Daftar resmi dikurangi dirinya, urutan dan label persis | PIC tiap repo | setelah Auditor menulis instruksi di handoff |
+| Tabel kunci penyimpanan di atas | PIC yang menambah kunci, lalu lapor Auditor | kunci baru |
+| Pola uji pasca-deploy yang terbukti di satu repo | PIC mengusulkan di handoff sendiri; Auditor menyebarkan | temuan baru |
+
+**Proyek baru, urutan:** (1) Amal membuat repo kosong dan mengaktifkan Pages (Source = GitHub Actions); (2) PIC baru
+mengikuti pola repo ini dan lapor ke Auditor lewat handoff; (3) Auditor menambah repo ke cakupan, memperbarui Daftar resmi
+dan bagian bersama di semua repo, lalu menulis instruksi tautan ke tiap PIC; (4) tiap PIC menambah tautan (satu push, uji
+320-430 px, axe) dan mencatat hasil; (5) Auditor memverifikasi.
+
+**Temuan untuk repo lain:** tulis di handoff sendiri (bagian "Untuk repo lain") dan beri tahu Auditor. Auditor
+menyalurkannya sebagai instruksi di `AUDIT-HANDOFF-*-auditor.md` repo tujuan. PIC tidak mengubah repo lain. Pesan langsung
+antar-PIC hanya pemberitahuan, bukan instruksi. Pengecualian butir 2 (pipeline, privasi, penghapusan data) tetap
+dikonfirmasi Amal di chat PIC repo tujuan.
+
 ## Lapor ke sesi "Auditor Project"
 
 Amal menugaskan satu sesi Claude terpisah sebagai auditor lintas-project (mengawasi `catatankajian`, `jadwalkajian`,
@@ -159,7 +188,7 @@ Amal menugaskan satu sesi Claude terpisah sebagai auditor lintas-project (mengaw
 **"Auditor Project"** (ID bisa berubah kalau sesi lama berakhir), atau tanya Amal langsung.
 
 **Aturan akses berkas** (disalin dari `catatankajian`, disetujui Amal 29 Sep 2026 untuk repo yang diaudit; berlaku di
-sini setelah Auditor mengonfirmasi repo ini masuk cakupan audit):
+sini; repo ini masuk cakupan audit, dikonfirmasi Auditor dan Amal 22 Okt 2026):
 - **Hanya sesi kerja repo ini (bukan Auditor) yang boleh mengubah berkas inti**: `index.html`, `lib/`, `favicon.svg`,
   `og-image.png`, `robots.txt`, `sitemap.xml`, `scripts/test_site.js`, `.github/workflows/deploy.yml`.
 - **Auditor Project boleh mengubah**: `CLAUDE.md`, `AUDIT-HANDOFF-*.md` (termasuk menulis balasan), dan
