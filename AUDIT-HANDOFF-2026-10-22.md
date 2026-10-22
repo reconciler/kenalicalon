@@ -140,3 +140,43 @@ penghapusan data. Izin Amal untuk perubahan tampilan sudah tercatat (bagian 1). 
 - **Belum terbukti:** tampilan live di perangkat nyata (aturan 11); isi situs live hanya terbukti lewat log (egress diblokir).
 - `scripts/test_site.js` diperluas (8 sesi, 4 mode tema, `incomplete` axe, uji klaim vs data, metrik tinggi, `KC_ONLY`,
   `KC_BASELINE`); `CLAUDE.md` bagian khusus repo (Keputusan terbuka, jumlah pertanyaan, garis dasar uji) diperbarui.
+
+### 9.2 Push B (`b0d8ce7`): akordeon "Tentang", rename blok in-page, hapus nav footer. **Tampilan berubah.**
+
+| Butir spesifikasi (Auditor bagian 3) | Hasil ([Terverifikasi], lokal, kecuali disebut lain) |
+|---|---|
+| Tombol berlabel persis "Tentang", tertutup default, `aria-expanded` dan `aria-controls` | Ya. Uji Tentang **111/111 lulus** (beranda, Hari 1, penutup x 320/375/430) |
+| Menutup: klik di luar, Esc (fokus kembali ke tombol), klik tombol | Ya, plus menutup saat pindah halaman. Esc juga bila fokus ada di dalam panel |
+| Isi: "Dibuat oleh @amalwoodworking" + "Proyek lain" (Jadwal Kajian, Catatan Kajian, Bikin CV Taaruf) | Dirender dari konstanta `ABOUT`; label, URL, urutan = Daftar resmi; 1 Instagram + 3 proyek; semua `target="_blank" rel="noopener noreferrer"`; tanpa tautan GitHub; tautan proyek di luar panel = 0 |
+| Eyebrow in-page jadi "Untuk siapa"; cek anchor `#tentang` | Eyebrow dan id jadi `#untuk-siapa`; anchor `#tentang` dihapus. **[Kesimpulan sendiri]** tidak ada rujukan lain di repo (grep); tautan luar lama ke `#tentang`, bila ada, hanya menggulir ke atas |
+| Hapus label dan nav footer "Proyek lain" | Ya. Baris merek (dengan Instagram) dan credit tetap |
+| Tinggi sebelum = sesudah (panel tertutup, 320/375/430) | Hero, tinggi di atas footer, topbar, pita, dan halaman sesi (Hari 1) **sama persis** dengan baseline versi A. Tinggi dokumen beranda **-124 / -124 / -94 px** karena footer lebih pendek (nav dihapus), sesuai arahan |
+| axe 0 pelanggaran dengan panel terbuka (320/430, terang/gelap, manual) | **0 pelanggaran** di 40 audit panel terbuka dan 112 audit total. Lihat "perlu cek" di bawah |
+| Tanpa permintaan jaringan baru; kunci `localStorage` lain | 0 permintaan luar; kunci proyek lain tidak tersentuh |
+
+- **Penempatan dan alasan.** Beranda: pojok kanan atas hero (di dalam `.hero-in`, `position:absolute`, 8 px dari atas, 16 px dari
+  kanan). Tampilan sesi: pojok kanan atas pita warna, lewat slot setinggi nol di antara topbar dan pita (panel harus di luar
+  `overflow:hidden` milik pita). **Bukan di topbar sesi:** terukur di 320 px, kolom tengah topbar 141 px dengan teks
+  "Hari 1 dari 7" 80 px; tombol 99 px sebagai kolom ke-4 menyisakan 32 px, jadi teks membungkus dan topbar bertambah tinggi.
+  Tombol tidak menimpa teks (diuji dengan rect teks per baris: kicker, titik hari, judul). Perbandingan piksel A vs B di 9
+  screenshot sesi dan hero beranda: selisih **hanya kotak tombol** (99 x 36 px, 16 px dari tepi kanan).
+- **"Perlu cek" axe saat panel terbuka:** 36 dari 40 audit panel terbuka memuat `color-contrast` "perlu cek", seluruhnya
+  dengan alasan axe `bgOverlap` (teks di bawah panel tertutup panelnya sendiri, jadi latarnya tak bisa dihitung). Dalam keadaan
+  **tertutup**: 72 audit, 0 pelanggaran, **0 "perlu cek"**; teks panel sendiri lolos. **[Kesimpulan sendiri]** ini sifat bawaan
+  overlay, bukan soal warna kicker, jadi cadangan `#F6E4CD` tidak dipakai dan tidak ada perbaikan yang masuk akal. Auditor
+  silakan menilai.
+- **Run Actions:** #7 (docs A) dan #8 (push B `b0d8ce7`) `success`; log runner #8: seluruh pengecekan OK (berkas publik,
+  font, berkas internal 404, penjaga klaim, 6 aset yang dirujuk).
+- **Belum terbukti:** tampilan di perangkat nyata (sentuh, iOS Safari, safe-area); pembaca layar (VoiceOver/TalkBack) dan
+  urutan Tab tidak diuji (hanya axe, Esc, dan fokus); isi situs live hanya terbukti lewat log (egress diblokir).
+- **Uji:** suite penuh 139/139 cek lulus; 0 permintaan jaringan luar; 0 error konsol. Skrip uji sempat gagal pada 4 jenis cek
+  karena **kesalahan skrip saya sendiri** (membaca `innerText` yang terkena `text-transform: uppercase`; membandingkan kotak
+  blok selebar kolom, bukan teks yang tampak). Situs tidak berubah; skrip diperbaiki sebelum push.
+
+### 9.3 Untuk repo lain (usulan; Auditor yang menyalurkan)
+
+1. **Panel "Tentang" dan axe:** audit axe dengan panel terbuka memberi "perlu cek" `color-contrast` (alasan `bgOverlap`) pada
+   teks yang tertutup panel. Normal untuk overlay; patokannya audit dalam keadaan tertutup (0 pelanggaran, 0 "perlu cek"). Jangan
+   mengubah warna hanya untuk menghilangkannya.
+2. **Pola uji yang terbukti di sini** (opsional): rect teks per baris untuk uji "tombol tidak menimpa teks"; perbandingan
+   tinggi sebelum/sesudah lewat baseline (`KC_ONLY=metrics`, `KC_BASELINE`) di `scripts/test_site.js`.

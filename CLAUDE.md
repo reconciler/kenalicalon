@@ -11,7 +11,8 @@ setelah `catatankajian`, `jadwalkajian`, `bikin-cv-taaruf`; aturan bersama di ba
 ## Struktur
 
 - `index.html` — satu file: CSS, markup, data pertanyaan (`window.PANDUAN_DATA`), dan JS. Tanpa build step; file ini
-  sumber kebenaran sejak 22 Okt 2026.
+  sumber kebenaran sejak 22 Okt 2026. Panel "Tentang" dirender dari konstanta `ABOUT` di JS (Instagram pembuat + proyek
+  lain = Daftar resmi dikurangi proyek ini, urutan dan label persis); ubah di sana bila Daftar resmi berubah.
 - `lib/fonts/` — Poppins latin 400/500/600/700 (woff2) dari paket npm `@fontsource/poppins@5.3.0` (OFL-1.1, lisensi di
   `lib/fonts/OFL.txt`); sha1 tarball `2b0b95ad6d221ca81f884796429b209837954b89` dicocokkan ke registry npm. `index.html`
   tidak memuat apa pun dari luar origin (tanpa Google Fonts/CDN).
@@ -65,17 +66,22 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
 - Jalankan `scripts/test_site.js` (aturan lintas-repo 13 dan 19): axe di beranda + 8 sesi, 320/430 px, 4 mode (terang,
   gelap, `data-theme` gelap/terang manual); klaim UI vs data; fungsi inti; font lokal; jaringan luar diblokir; metrik
   tinggi. `KC_ONLY=metrics` dan `KC_BASELINE=<hasil.json>` untuk membandingkan tinggi sebelum/sesudah perubahan.
-- Garis dasar setelah push A (22 Okt 2026): axe 0 pelanggaran dan 0 "perlu cek" di 72 audit; 18/18 cek lulus; 0 permintaan
-  jaringan luar; 0 error konsol.
+- Garis dasar setelah push B (22 Okt 2026): axe 0 pelanggaran di 112 audit; panel tertutup (72 audit) 0 "perlu cek"; panel
+  terbuka (40 audit) 36 "perlu cek" `color-contrast` dengan alasan axe `bgOverlap` (teks di bawah panel tertutup panel,
+  sifat overlay, bukan soal warna); 139/139 cek lulus (111 uji Tentang); 0 permintaan jaringan luar; 0 error konsol.
 - Perubahan tampilan: sebut bahwa tampilan berubah (aturan 11); cek visual di perangkat nyata oleh Amal.
 
 ## Keputusan terbuka (per 22 Okt 2026; arahan Auditor sudah tercatat di `AUDIT-HANDOFF-2026-10-22-auditor.md`, PIC memperbarui bagian ini saat mengeksekusi)
 
+Semua butir arahan 22 Okt 2026 sudah dieksekusi (push A `1d9f403`, push B `b0d8ce7`). **Sisa yang terbuka: tidak ada.**
+Belum terbukti: tampilan di perangkat nyata (aturan 11) dan uji pembaca layar/urutan Tab (hanya Esc, fokus, dan axe yang diuji).
+
 1. **Kontras kicker** (`.band .kicker`): **selesai, push A (`1d9f403`, 22 Okt 2026)**. Amber `#E0A458` (2,77:1 sampai 4,79:1
    di 8 warna pita) diganti token `--band-kicker` `#F3DBBC` (minimum 4,52:1). axe 0 pelanggaran dan 0 "perlu cek" di 72
    audit, jadi cadangan `#F6E4CD` tidak dipakai. Hero `.hero .kicker` tetap amber (lolos).
-2. **Akordeon "Tentang"** (pola di bawah): **belum diterapkan**; arahan Auditor ada (butir 3), dieksekusi di push B. Sekarang
-   masih blok "Tentang" di halaman dan footer "Proyek lain" (tautan di luar panel).
+2. **Akordeon "Tentang"** (pola di bawah): **selesai, push B (`b0d8ce7`, 22 Okt 2026)**. Blok in-page kini berjudul "Untuk
+   siapa" (`#untuk-siapa`; anchor lama `#tentang` dihapus, tidak ada rujukan lain), footer tanpa label/nav "Proyek lain"
+   (baris merek dan credit tetap).
 3. **Daftar resmi**: sudah memuat Kenali Calon (Auditor, 22 Okt 2026). Panel di tiga repo lain dikerjakan PIC masing-masing.
 4. **Klaim UI** (aturan lintas-repo 8), keputusan Auditor 22 Okt 2026, selesai di push A: "18-28" menjadi **"16-28"**
    (benar di semua peran, dijaga uji dari `PANDUAN_DATA`); "menit per sesi" menjadi **"perkiraan menit per sesi"** (angka
@@ -95,7 +101,10 @@ Keempat situs (`catatankajian`, `jadwalkajian`, `bikin-cv-taaruf`, `kenalicalon`
 **Pola "Tentang" dan proyek lain** (diminta Amal 30 Sep 2026, direvisi 1 Okt 2026, untuk tiga repo lain): satu akordeon di
 header bernama "Tentang", tertutup, menutup dengan klik di luar dan Esc; isinya hanya kredit pembuat (Instagram) dan
 Proyek lain; tanpa tautan kode sumber/GitHub dan tanpa deskripsi singkat; tinggi header tidak bertambah (uji 320-430 px).
-**Status di repo ini: belum diterapkan** (keputusan terbuka no. 2).
+**Status di repo ini: diterapkan (push B, 22 Okt 2026).** Tombol di pojok kanan atas hero (beranda) dan pita sesi (tampilan
+sesi), di luar alur layout sehingga tinggi tidak bertambah. Bukan di topbar sesi: di 320 px kolom tengahnya 141 px (teks
+"Hari 1 dari 7" 80 px); tombol 99 px sebagai kolom ke-4 menyisakan 32 px, jadi teks membungkus dan topbar bertambah tinggi
+(angka terukur). Panel overlay menutup lewat klik tombol, klik di luar, Esc (fokus kembali ke tombol), dan pindah halaman.
 
 **Daftar resmi** (dijaga Auditor; bila URL berubah, Auditor memperbarui semua repo dan memberi tahu PIC):
 - Pembuat: `@amalwoodworking`, https://www.instagram.com/amalwoodworking/
