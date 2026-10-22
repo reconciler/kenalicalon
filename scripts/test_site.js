@@ -1,13 +1,15 @@
-// Uji lokal Kenali Calon: axe-core (320/375/430, terang/gelap), fungsi inti, font lokal,
-// jaringan luar diblokir, screenshot. Tidak ikut terbit (scripts/ tidak disalin ke _site).
+// Uji lokal Kenali Calon: axe-core (8 sesi + beranda, 320/430, terang/gelap + data-theme manual), fungsi inti,
+// klaim UI vs data, font lokal, jaringan luar diblokir, metrik tinggi, screenshot.
+// Tidak ikut terbit (scripts/ tidak disalin ke _site).
 // Pakai:
 //   npm i --prefix /tmp/kc-test playwright-core@1.56.1 axe-core@4.14.0
 //   mkdir -p /tmp/kc-serve && ln -sfn /path/ke/repo /tmp/kc-serve/kenalicalon     # meniru subpath Pages
 //   (cd /tmp/kc-serve && python3 -m http.server 8765 --bind 127.0.0.1 &)
 //   NODE_PATH=/tmp/kc-test/node_modules CHROMIUM_PATH=/opt/pw-browsers/chromium \
 //     node scripts/test_site.js http://127.0.0.1:8765/kenalicalon/ /tmp/kc-shots
-// Mengandalkan: kunci localStorage "kenalicalon_v1", selector .band h1, id #cta-start, #copy-btn,
-// #clear-open/#clear-yes. Ubah bersama bila UI berubah.
+// Keluaran: ringkasan di stdout, rincian di <OUT>/hasil.json (axe, metrik tinggi, cek), screenshot di <OUT>.
+// Mengandalkan: kunci localStorage "kenalicalon_v1", selector .band h1, .stats, .fokus b, id #cta-start,
+// #copy-btn, #clear-open/#clear-yes. Ubah bersama bila UI berubah.
 const { chromium } = require("playwright-core");
 const fs = require("fs");
 const path = require("path");
@@ -18,7 +20,16 @@ const OUT = process.argv[3];
 fs.mkdirSync(OUT, { recursive: true });
 const origin = new URL(BASE).origin;
 
-const results = { axe: [], external: [], console: [], checks: [] };
+const SESSIONS = ["hari1", "hari2", "hari3", "hari4", "hari5", "hari6", "hari7", "penutup"];
+// mode tampilan untuk axe: emulasi prefers-color-scheme, dan/atau atribut data-theme manual
+const MODES = [
+  { name: "terang", scheme: "light" },
+  { name: "gelap", scheme: "dark" },
+  { name: "tema-gelap-manual", scheme: "light", theme: "dark" },
+  { name: "tema-terang-manual", scheme: "dark", theme: "light" },
+];
+
+const results = { axe: [], external: [], console: [], checks: [], metrics: {} };
 const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, detail: detail || "" });
 
 (async () => {
@@ -43,32 +54,91 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
 
   async function runAxe(page, label) {
     await page.evaluate(axeSrc);
-    const r = await page.evaluate(async () => await axe.run(document, { resultTypes: ["violations"] }));
-    results.axe.push({ label, violations: r.violations.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, sample: v.nodes[0] && v.nodes[0].html.slice(0, 120) })) });
+    const r = await page.evaluate(async () => await axe.run(document, { resultTypes: ["violations", "incomplete"] }));
+    const pack = (v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, sample: v.nodes[0] && v.nodes[0].html.slice(0, 120) });
+    results.axe.push({ label, violations: r.violations.map(pack), incomplete: r.incomplete.map(pack) });
   }
 
-  // --- axe + screenshot: beranda dan sesi, 320/375/430, terang/gelap
+  const applyTheme = (page, mode) =>
+    mode.theme ? page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), mode.theme) : Promise.resolve();
+
+  // --- axe: beranda + 8 sesi, 320/430, 4 mode tampilan
+  for (const mode of MODES) {
+    for (const w of [320, 430]) {
+      const { ctx, page } = await newPage(w, mode.scheme);
+      await page.goto(BASE, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      await applyTheme(page, mode);
+      await runAxe(page, `beranda ${w}px ${mode.name}`);
+      for (const key of SESSIONS) {
+        await page.goto(`${BASE}#${key}`, { waitUntil: "networkidle" });
+        await page.reload({ waitUntil: "networkidle" });
+        await applyTheme(page, mode);
+        // buka satu kotak jawaban + isi supaya state aktif ikut diuji
+        const btn = page.locator(".write").first();
+        if (await btn.count()) { await btn.click(); await page.locator(".ta textarea").first().fill("Uji"); }
+        await runAxe(page, `${key} ${w}px ${mode.name}`);
+      }
+      await ctx.close();
+    }
+  }
+
+  // --- screenshot + overflow + metrik tinggi (320/375/430, terang/gelap)
   for (const scheme of ["light", "dark"]) {
     for (const w of [320, 375, 430]) {
       const { ctx, page } = await newPage(w, scheme);
       await page.goto(BASE, { waitUntil: "networkidle" });
       await page.evaluate(() => document.fonts.ready);
-      if (w !== 375) await runAxe(page, `beranda ${w}px ${scheme}`);
+      if (scheme === "light") {
+        results.metrics[w] = await page.evaluate(() => ({
+          hero: Math.round(document.querySelector(".hero").getBoundingClientRect().height * 100) / 100,
+          aboveFooter: Math.round(document.querySelector(".site-footer").offsetTop * 100) / 100,
+          doc: document.documentElement.scrollHeight,
+        }));
+      }
       await page.screenshot({ path: path.join(OUT, `beranda-${w}-${scheme}.png`), fullPage: true });
       for (const key of ["hari1", "hari3", "penutup"]) {
         await page.goto(`${BASE}#${key}`, { waitUntil: "networkidle" });
         await page.reload({ waitUntil: "networkidle" });
-        // buka satu kotak jawaban + isi supaya state aktif ikut diuji
-        const btn = page.locator(".write").first();
-        if (await btn.count()) { await btn.click(); await page.locator(".ta textarea").first().fill("Uji"); }
-        if (w !== 375) await runAxe(page, `${key} ${w}px ${scheme}`);
         if (scheme === "light") { await page.evaluate(() => document.activeElement && document.activeElement.blur()); await page.waitForTimeout(500); await page.screenshot({ path: path.join(OUT, `${key}-${w}.png`), fullPage: false }); }
       }
-      // overflow horizontal
+      await page.goto(BASE, { waitUntil: "networkidle" });
       const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       ok(`tanpa scroll horizontal ${w}px ${scheme}`, over <= 0, `selisih ${over}px`);
       await ctx.close();
     }
+  }
+
+  // --- klaim UI vs data (aturan lintas-repo 8): jumlah sesi dan rentang pertanyaan per sesi
+  {
+    const { ctx, page } = await newPage(430, "light");
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const D = await page.evaluate(() => window.PANDUAN_DATA);
+    const visibleFor = (q, role) => !q.g || role === "semua" || (role === "suami" && q.g === "s") || (role === "istri" && q.g === "i");
+    const countFor = (d, role) => d.cats.reduce((n, c) => n + c.qs.filter((q) => visibleFor(q, role)).length, 0);
+    const all = [];
+    D.days.forEach((d) => ["semua", "suami", "istri"].forEach((r) => all.push(countFor(d, r))));
+    const lo = Math.min(...all), hi = Math.max(...all);
+    const stat = await page.evaluate(() => [...document.querySelectorAll(".stats div")].map((el) => ({ b: el.querySelector("b").innerText, span: el.querySelector("span").innerText })));
+    const m = stat[1].b.match(/(\d+)\s*[–-]\s*(\d+)/);
+    ok(`rentang pertanyaan per sesi di UI = data (${lo}-${hi}, semua peran)`, !!m && +m[1] === lo && +m[2] === hi, `UI="${stat[1].b}" data=${lo}-${hi}`);
+    ok("jumlah sesi di UI = data", +stat[0].b === D.days.length, `UI=${stat[0].b} data=${D.days.length}`);
+    ok("label estimasi waktu memakai kata 'perkiraan'", /perkiraan/i.test(stat[2].span), stat[2].span);
+
+    // hitungan di UI (kalimat "N pertanyaan.") sama dengan hitungan dari data, 7 hari x 3 peran
+    let mism = [];
+    for (const role of ["semua", "suami", "istri"]) {
+      await page.evaluate((r) => localStorage.setItem("kenalicalon_v1", JSON.stringify({ role: r, name: "", ans: {} })), role);
+      for (let i = 0; i < D.days.length; i++) {
+        await page.goto(`${BASE}#hari${i + 1}`, { waitUntil: "networkidle" });
+        await page.reload({ waitUntil: "networkidle" });
+        const ui = await page.locator(".fokus b").last().innerText();
+        const want = countFor(D.days[i], role);
+        if (ui.trim() !== `${want} pertanyaan.`) mism.push(`hari${i + 1}/${role}: UI="${ui}" data=${want}`);
+      }
+    }
+    ok("jumlah pertanyaan tampil di UI = data (7 hari x 3 peran)", mism.length === 0, mism.join("; "));
+    await ctx.close();
   }
 
   // --- fungsi inti (430px, terang)
@@ -104,7 +174,6 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
     // filter peran: istri tidak melihat pertanyaan khusus suami (Hari 3 q21 khusus calon istri/suami)
     await page.goto(`${BASE}#hari3`, { waitUntil: "networkidle" });
     await page.reload({ waitUntil: "networkidle" });
-    const txt = await page.locator("main, #v-session").first().innerText().catch(() => "");
     const sess = await page.locator("#v-session").innerText();
     ok("peran istri: pertanyaan 'khusus calon suami' tersembunyi", !sess.includes("Khusus calon suami") && sess.includes("Khusus calon istri"));
 
@@ -136,10 +205,13 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
   fs.writeFileSync(path.join(OUT, "hasil.json"), JSON.stringify(results, null, 2));
 
   const totalViol = results.axe.reduce((n, a) => n + a.violations.length, 0);
-  console.log("AXE: " + results.axe.length + " halaman diuji, pelanggaran: " + totalViol);
+  console.log("AXE: " + results.axe.length + " audit, pelanggaran: " + totalViol);
   results.axe.filter((a) => a.violations.length).forEach((a) => console.log("  " + a.label + " -> " + JSON.stringify(a.violations)));
+  const inc = results.axe.filter((a) => a.incomplete.length);
+  console.log("AXE 'perlu cek' (incomplete): " + inc.length + " audit" + (inc.length ? "\n  " + inc.map((a) => a.label + " -> " + a.incomplete.map((i) => i.id + "x" + i.nodes).join(",")).slice(0, 12).join("\n  ") : ""));
+  console.log("METRIK tinggi (terang, beranda): " + JSON.stringify(results.metrics));
   console.log("PERMINTAAN LUAR DIBLOKIR: " + results.external.length + (results.external.length ? " " + JSON.stringify([...new Set(results.external)]) : ""));
   console.log("KONSOL error/warn: " + results.console.length + (results.console.length ? "\n  " + [...new Set(results.console)].join("\n  ") : ""));
   results.checks.forEach((c) => console.log((c.pass ? "PASS " : "FAIL ") + c.name + (c.pass ? "" : "  -> " + c.detail)));
-  process.exit(results.checks.every((c) => c.pass) ? 0 : 1);
+  process.exit(results.checks.every((c) => c.pass) && totalViol === 0 ? 0 : 1);
 })();
