@@ -128,7 +128,7 @@ button { font: inherit; color: inherit; }
 
 /* ---------- sampul ---------- */
 .hero { background: var(--cover); color: var(--on-band); }
-.hero-in { padding-block: 28px 44px; display: grid; gap: 14px; }
+.hero-in { padding-block: 28px 44px; display: grid; gap: 14px; position: relative; }
 .hero-art { width: min(300px, 82%); height: auto; justify-self: center; margin-bottom: 6px; }
 .hero .kicker { color: var(--amber); }
 .hero h1 { font-size: clamp(30px, 8.5vw, 44px); font-weight: 700; letter-spacing: -.01em; }
@@ -143,7 +143,7 @@ button { font: inherit; color: inherit; }
 
 /* ---------- blok halaman depan: tiap blok punya latar sendiri ---------- */
 .block { padding-block: 56px 64px; border-top: 1px solid var(--line); }
-.block-tentang { background: var(--surface); border-top: 0; }
+.block-untuk { background: var(--surface); border-top: 0; }
 .block-cara { background: var(--p1t); }
 .block-daftar { background: var(--bg); }
 .block-head { display: grid; gap: 6px; margin-bottom: 24px; }
@@ -225,9 +225,29 @@ button { font: inherit; color: inherit; }
 .site-footer .brand { color: var(--on-band); font-weight: 700; font-size: 17px; }
 .site-footer .brand a { font-weight: 600; }
 .site-footer .credit { margin-top: 4px; max-width: 46ch; }
-.site-footer .others { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--cover-line); }
-.site-footer nav { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 8px; }
 .site-footer a { color: var(--on-band); font-weight: 500; }
+
+/* ---------- Tentang (akordeon): pojok kanan atas hero/pita sesi, di luar alur layout (tidak menambah tinggi) ---------- */
+.about { position: absolute; top: 8px; right: max(16px, env(safe-area-inset-right, 0px)); z-index: 4; }
+.about-btn {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 6px 10px 6px 14px; border-radius: 999px;
+  border: 1px solid rgba(243, 233, 215, .55); background: var(--cover); color: var(--cream);
+  font-size: 13px; font-weight: 600; line-height: 1.2; cursor: pointer;
+}
+.about-btn svg { width: 14px; height: 14px; flex: none; transition: transform .15s ease; }
+.about-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.about-slot { position: relative; height: 0; z-index: 4; }
+.about-wrap { position: relative; height: 0; }
+.about-slot .about-btn { background: var(--phb); color: var(--on-band); border-color: rgba(255, 255, 255, .55); }
+.about-panel {
+  position: absolute; right: 0; top: calc(100% + 6px); width: min(280px, calc(100vw - 32px));
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25); padding: 14px 16px; display: grid; gap: 14px; font-size: 14px; line-height: 1.4;
+}
+.about-panel a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.about-label { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.about-panel ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.about-panel li a { display: block; padding: 8px 0; }
 
 /* ---------- sesi ---------- */
 .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
@@ -332,10 +352,10 @@ button { font: inherit; color: inherit; }
     </div>
   </header>
 
-  <section class="block block-tentang" id="tentang">
+  <section class="block block-untuk" id="untuk-siapa">
     <div class="wrap">
       <div class="block-head">
-        <p class="eyebrow">Tentang</p>
+        <p class="eyebrow">Untuk siapa</p>
         <h2>Untuk calon pasangan yang sedang ta'aruf</h2>
         <p class="lead">Membantu saling memahami nilai, harapan, dan rencana sebelum memutuskan menikah.</p>
       </div>
@@ -415,12 +435,6 @@ button { font: inherit; color: inherit; }
     <div class="wrap">
       <p class="brand">Kenali Calon — <a href="https://www.instagram.com/amalwoodworking/" target="_blank" rel="noopener noreferrer">@amalwoodworking</a></p>
       <p class="credit">Pertanyaan dihimpun dari berbagai sumber eksternal, lalu disusun ulang.</p>
-      <p class="others">Proyek lain</p>
-      <nav>
-        <a href="https://reconciler.github.io/jadwalkajian/" target="_blank" rel="noopener noreferrer">Jadwal Kajian</a>
-        <a href="https://reconciler.github.io/catatankajian/" target="_blank" rel="noopener noreferrer">Catatan Kajian</a>
-        <a href="https://reconciler.github.io/bikin-cv-taaruf/" target="_blank" rel="noopener noreferrer">Bikin CV Taaruf</a>
-      </nav>
     </div>
   </footer>
 </main>
@@ -499,6 +513,43 @@ button { font: inherit; color: inherit; }
   var CHEV_L = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var CHEV_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var COPY = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+  var CHEV_D = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  // ---------- Tentang (akordeon): isi = Daftar resmi (CLAUDE.md) dikurangi proyek ini, urutan dan label persis ----------
+  var ABOUT = {
+    maker: { label: "@amalwoodworking", url: "https://www.instagram.com/amalwoodworking/" },
+    projects: [
+      { label: "Jadwal Kajian", url: "https://reconciler.github.io/jadwalkajian/" },
+      { label: "Catatan Kajian", url: "https://reconciler.github.io/catatankajian/" },
+      { label: "Bikin CV Taaruf", url: "https://reconciler.github.io/bikin-cv-taaruf/" }
+    ]
+  };
+  function aboutHtml(where) {
+    var id = "about-panel-" + where;
+    var links = ABOUT.projects.map(function (p) {
+      return '<li><a href="' + p.url + '" target="_blank" rel="noopener noreferrer">' + esc(p.label) + "</a></li>";
+    }).join("");
+    return '<div class="about"><button type="button" class="about-btn" data-about-btn aria-expanded="false" aria-controls="' + id + '">Tentang' + CHEV_D + "</button>" +
+      '<div class="about-panel" id="' + id + '" hidden>' +
+      '<p>Dibuat oleh <a href="' + ABOUT.maker.url + '" target="_blank" rel="noopener noreferrer">' + esc(ABOUT.maker.label) + "</a></p>" +
+      '<div><p class="about-label" id="about-label-' + where + '">Proyek lain</p><ul aria-labelledby="about-label-' + where + '">' + links + "</ul></div>" +
+      "</div></div>";
+  }
+  function closeAbout(returnFocus) {
+    document.querySelectorAll(".about-btn[aria-expanded='true']").forEach(function (b) {
+      b.setAttribute("aria-expanded", "false");
+      document.getElementById(b.getAttribute("aria-controls")).hidden = true;
+      if (returnFocus) b.focus();
+    });
+  }
+  function toggleAbout(btn) {
+    var wasOpen = btn.getAttribute("aria-expanded") === "true";
+    closeAbout(false);
+    if (!wasOpen) {
+      btn.setAttribute("aria-expanded", "true");
+      document.getElementById(btn.getAttribute("aria-controls")).hidden = false;
+    }
+  }
   var RINGS = '<svg class="band-art" viewBox="0 0 160 110" aria-hidden="true" focusable="false">' +
     '<circle cx="62" cy="55" r="36" fill="none" stroke="var(--on-band)" stroke-width="6"></circle>' +
     '<circle cx="98" cy="55" r="36" fill="none" stroke="var(--amber)" stroke-width="6"></circle></svg>';
@@ -621,6 +672,7 @@ button { font: inherit; color: inherit; }
       '<button type="button" class="back" data-go="home" data-then="daftarisi">' + CHEV_L + "Daftar isi</button>" +
       '<span class="tb-mid">' + mid + '</span><span class="tb-count" id="tb-count">' + st.done + "/" + st.total + "</span></div>" +
       '<div class="tb-bar" aria-hidden="true"><i id="tb-bar"></i></div></div>' +
+      '<div class="about-slot"><div class="wrap about-wrap">' + aboutHtml("sess") + "</div></div>" +
       '<header class="band">' + RINGS + '<div class="wrap band-in">' +
       (s.day ? '<ol class="dots" aria-label="Hari ' + s.day + ' dari 7">' + dots + "</ol>" : "") +
       '<p class="kicker">' + kicker + "</p><h1>" + esc(s.name) + "</h1>" +
@@ -714,6 +766,7 @@ button { font: inherit; color: inherit; }
 
   // ---------- navigasi ----------
   function go(key, then, push) {
+    closeAbout(false);
     var home = document.getElementById("v-home");
     var sess = document.getElementById("v-session");
     if (BYKEY[key]) {
@@ -751,9 +804,12 @@ button { font: inherit; color: inherit; }
 
   var saveTimers = {};
   document.addEventListener("click", function (e) {
-    var el = e.target.closest("[data-go],[data-scroll],[data-role],[data-yn],.write,#copy-btn,#clear-open,#clear-yes,#clear-no");
+    if (!e.target.closest(".about")) closeAbout(false);
+    var el = e.target.closest("[data-go],[data-scroll],[data-role],[data-yn],[data-about-btn],.write,#copy-btn,#clear-open,#clear-yes,#clear-no");
     if (!el) return;
-    if (el.hasAttribute("data-go")) {
+    if (el.hasAttribute("data-about-btn")) {
+      toggleAbout(el);
+    } else if (el.hasAttribute("data-go")) {
       e.preventDefault();
       go(el.getAttribute("data-go"), el.getAttribute("data-then"));
     } else if (el.hasAttribute("data-scroll")) {
@@ -809,6 +865,10 @@ button { font: inherit; color: inherit; }
     }
   });
 
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAbout(true);
+  });
+
   var nameTimer = null;
   document.addEventListener("input", function (e) {
     var t = e.target;
@@ -836,6 +896,7 @@ button { font: inherit; color: inherit; }
   });
 
   // ---------- mulai ----------
+  document.querySelector(".hero-in").insertAdjacentHTML("afterbegin", aboutHtml("home"));
   var start = (location.hash || "").replace("#", "");
   if (BYKEY[start]) go(start, null, false);
   else go("home", start || null, false);
