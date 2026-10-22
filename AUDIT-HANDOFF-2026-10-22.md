@@ -14,6 +14,11 @@ sesi ini. **[Usulan]** = kesimpulan/usulan PIC, belum diputuskan siapa pun.
   melapor ke Auditor, lalu menyesuaikan sesuai arahan Auditor "tanpa perlu konfirmasi ke saya".
   **[Usulan]** pengecualian di `CLAUDE.md` (privasi, pipeline/Pages, penghapusan data tetap konfirmasi Amal) dianggap
   **tetap berlaku**, karena kalimat Amal tidak menyebutnya. Mohon Auditor menegaskan.
+- **[Keputusan Amal]** 22 Okt 2026 (chat sesi PIC, setelah laporan awal): "semua usulan perubahan tampilan, silakan
+  dieksekusi setelah ada arahan dari auditor". Artinya usulan tampilan di dokumen ini (6.1 kontras kicker, 7b akordeon
+  "Tentang", dan sejenisnya) **boleh dieksekusi PIC begitu arahan Auditor tercatat di git**, tanpa konfirmasi ulang ke Amal.
+  **[Usulan]** penafsiran PIC: izin ini tidak mencakup pipeline/Pages, privasi, dan penghapusan data (tetap konfirmasi
+  Amal di chat PIC).
 - **Status terbit: TAYANG** di https://reconciler.github.io/kenalicalon/ (diperbarui setelah Amal mengaktifkan Pages).
   [Terverifikasi] Run #1 (push `ef5c2d6`) gagal di "Siapkan Pages" (`Get Pages site failed ... Pages enabled and
   configured to build using GitHub Actions`). Amal lalu mengubah Settings → Pages → Source = **GitHub Actions** (aturan
@@ -103,4 +108,8 @@ jadi bukti terbit hanya dari log Actions.
   ini). Situs sudah publik dan boleh diindeks mesin pencari (`robots.txt` mengizinkan); isinya pertanyaan, tanpa data pengguna.
 - **Perubahan perilaku vs artifact:** jawaban yang sudah ditulis di versi artifact tidak terbawa (origin berbeda dan kunci
   penyimpanan baru).
-- **Keputusan menunggu:** Auditor (7a-7e). Perubahan tampilan (6.1, 7b) dieksekusi PIC hanya setelah arahan Auditor tercatat di git.
+- **Keputusan menunggu:** Auditor (7a-7e). Izin Amal untuk perubahan tampilan sudah ada (lihat 1); PIC mengeksekusinya
+  setelah arahan Auditor tercatat di git, jadi Auditor tidak perlu menanyakan ulang ke Amal untuk butir tampilan.
+- **Keadaan sesi Auditor** ([Terverifikasi] lewat `get_session`, 22 Okt ~02:00 UTC): terhubung, status `need_input`,
+  menunggu persetujuan Amal untuk `add_repo` `reconciler/kenalicalon` (read-only) agar bisa memeriksa handoff dan situsnya.
+  Run #3 (push `f0a10af`) juga `success`.
