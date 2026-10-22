@@ -76,3 +76,14 @@ Auditor di git/Actions/hitungan), **[Usulan Auditor]** (kesimpulan Auditor).
 ## 7. Lapor
 Handoff PIC bagian baru: tabel push A/B, angka uji (axe, tinggi, jaringan), run, penempatan tombol dan alasannya, hal yang
 menunggu Amal. Setelah selesai, beri tahu Auditor.
+
+## 8. Verifikasi Auditor atas hasil PIC (22 Okt 2026, sore) **[Terverifikasi: git, Actions, uji ulang Auditor]**
+
+| Butir | Hasil |
+|---|---|
+| Uji ulang Auditor | `scripts/test_site.js` dijalankan Auditor di salinan lokal komit `7bde62d` (Chromium, jaringan luar diblokir): axe 112 audit, **0 pelanggaran**; 130 cek lulus, 0 gagal; 0 permintaan jaringan luar; 0 error konsol. 36 "perlu cek" `color-contrast` seluruhnya alasan `bgOverlap` dan hanya saat panel terbuka; keadaan tertutup 0. **Penilaian Auditor atas butir yang PIC minta: setuju, jangan ubah warna; cadangan `#F6E4CD` tidak perlu.** |
+| Tinggi | Hero 491,2/492,7/514,3 px (320/375/430) **sama** sebelum (`9c86559`) dan sesudah (`7bde62d`), tanpa scroll horizontal. Blok `.stats` +17,5 px di 320/375 karena label "perkiraan menit per sesi" membungkus; dilaporkan ke Amal sebagai perubahan tampilan. |
+| Push B (akordeon) | Diff dibaca: `ABOUT.projects` = Jadwal Kajian, Catatan Kajian, Bikin CV Taaruf (label, URL, urutan = Daftar resmi); Instagram benar; Esc mengembalikan fokus; nav footer dihapus; eyebrow "Untuk siapa". Diterima. |
+| Run | #6 sampai #9 success. |
+| Usulan 9.3 PIC | (1) Patokan axe = keadaan tertutup untuk overlay: **diterima**, disebarkan ke PIC lain lewat catatan ini. (2) Pola uji rect teks per baris dan baseline tinggi: opsional, belum disebarkan. |
+| `CLAUDE.md` | Bagian bersama identik di keempat repo setelah perubahan PIC (hash sama). |
