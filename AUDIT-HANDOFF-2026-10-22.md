@@ -113,3 +113,30 @@ jadi bukti terbit hanya dari log Actions.
 - **Keadaan sesi Auditor** ([Terverifikasi] lewat `get_session`, 22 Okt ~02:00 UTC): terhubung, status `need_input`,
   menunggu persetujuan Amal untuk `add_repo` `reconciler/kenalicalon` (read-only) agar bisa memeriksa handoff dan situsnya.
   Run #3 (push `f0a10af`) juga `success`.
+
+## 9. Eksekusi arahan Auditor (22 Okt 2026, `AUDIT-HANDOFF-2026-10-22-auditor.md`)
+
+Dasar: instruksi diperiksa di git (commit `9c86559`), konsisten dengan `CLAUDE.md`, tidak menyentuh privasi, pipeline, atau
+penghapusan data. Izin Amal untuk perubahan tampilan sudah tercatat (bagian 1). Dua push sesuai arahan (6.1).
+
+### 9.1 Push A (`1d9f403`): kontras kicker + klaim UI. **Tampilan berubah.**
+
+| Butir Auditor | Perubahan | Bukti ([Terverifikasi], lokal) |
+|---|---|---|
+| 4 Kontras kicker | `.band .kicker` memakai token `--band-kicker: #F3DBBC` (hero tetap amber, sudah lolos) | axe sebelum: **52 pelanggaran** di 72 audit (semua `color-contrast` pada `.kicker`); sesudah: **0 pelanggaran, 0 "perlu cek"**. 72 audit = beranda + 8 sesi x 320/430 x terang, gelap, `data-theme` gelap manual, `data-theme` terang manual. Cadangan `#F6E4CD` tidak dipakai. Perbandingan piksel halaman sesi (9 screenshot): selisih hanya di baris kicker |
+| 5 "60-90 menit" | Label jadi "perkiraan menit per sesi", angka tetap | Uji label lulus |
+| 5 "18-28 pertanyaan" | Jadi **16-28** | Rentang dihitung dari `PANDUAN_DATA` (7 hari x 3 peran) = 16-28; UI = data lulus; jumlah "N pertanyaan." yang tampil di UI = data untuk 21 kombinasi hari/peran lulus |
+| 5 "sumber eksternal" | Kalimat dipertahankan | Dicatat: **pernyataan pemilik, sumber tidak disebut, tidak diverifikasi** |
+| 6.1 `lastmod` sitemap | Tidak diubah | Sudah `2026-10-22` (hari yang sama) |
+
+- **Reproduksi gagal dulu:** skrip uji baru dijalankan pada versi sebelum perubahan: 52 pelanggaran axe dan 2 cek klaim
+  gagal (UI "18-28" vs data 16-28; label tanpa "perkiraan"). Sesudah perubahan: 0 pelanggaran, semua cek lulus.
+- **Tinggi** (beranda, terang): hero 491,2 / 492,66 / 514,28 px di 320/375/430, **sama** sebelum dan sesudah. Tinggi halaman
+  **+18 px (320), +17 px (375), 0 (430)**: label stat yang lebih panjang membungkus satu baris lagi di kartu ketiga.
+  Arahan memperkirakan "tata letak sama"; selisih ini kecil, tidak dikoreksi, dilaporkan di sini.
+- **Cek lain:** 18/18 cek lulus; 0 permintaan jaringan luar; 0 error konsol; tanpa scroll horizontal 320/375/430.
+- **Run Actions #6** (push `1d9f403`): `success`; log runner: 21 pengecekan OK (beranda + penanda, berkas publik, font,
+  berkas internal 404 termasuk kedua `AUDIT-HANDOFF`, penjaga klaim, 6 aset yang dirujuk).
+- **Belum terbukti:** tampilan live di perangkat nyata (aturan 11); isi situs live hanya terbukti lewat log (egress diblokir).
+- `scripts/test_site.js` diperluas (8 sesi, 4 mode tema, `incomplete` axe, uji klaim vs data, metrik tinggi, `KC_ONLY`,
+  `KC_BASELINE`); `CLAUDE.md` bagian khusus repo (Keputusan terbuka, jumlah pertanyaan, garis dasar uji) diperbarui.

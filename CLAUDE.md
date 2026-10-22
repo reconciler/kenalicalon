@@ -48,8 +48,9 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
 - Mengubah bentuk data penyimpanan: naikkan versi kunci (`kenalicalon_v2`), tulis migrasi atau catat bahwa jawaban lama
   hilang, dan laporkan ke Auditor.
 - Semua teks Bahasa Indonesia, ringkas, bentuk "kamu". Bila jumlah sesi/pertanyaan berubah, perbarui blok "Tentang"
-  (7 sesi; 18-28 pertanyaan per sesi dihitung dari data, "60-90 menit per sesi" adalah estimasi pembuat artifact,
-  belum divalidasi).
+  (7 sesi; "16-28 pertanyaan per sesi" = rentang terkecil-terbesar di semua peran, dihitung dari data; "60-90" =
+  perkiraan pembuat artifact, belum divalidasi). `scripts/test_site.js` membandingkan angka di UI dengan `PANDUAN_DATA`,
+  jadi ubah teks stat bersama datanya.
 
 ## Penyimpanan dan privasi
 
@@ -61,19 +62,25 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
 
 ## Uji sebelum push
 
-- Jalankan `scripts/test_site.js` (aturan lintas-repo 13 dan 19). Garis dasar 22 Okt 2026: beranda 0 pelanggaran axe;
-  halaman sesi hanya `color-contrast` pada `.kicker` (lihat keputusan terbuka). 14/14 uji fungsi lulus, 0 permintaan
-  jaringan luar, 0 error konsol.
+- Jalankan `scripts/test_site.js` (aturan lintas-repo 13 dan 19): axe di beranda + 8 sesi, 320/430 px, 4 mode (terang,
+  gelap, `data-theme` gelap/terang manual); klaim UI vs data; fungsi inti; font lokal; jaringan luar diblokir; metrik
+  tinggi. `KC_ONLY=metrics` dan `KC_BASELINE=<hasil.json>` untuk membandingkan tinggi sebelum/sesudah perubahan.
+- Garis dasar setelah push A (22 Okt 2026): axe 0 pelanggaran dan 0 "perlu cek" di 72 audit; 18/18 cek lulus; 0 permintaan
+  jaringan luar; 0 error konsol.
 - Perubahan tampilan: sebut bahwa tampilan berubah (aturan 11); cek visual di perangkat nyata oleh Amal.
 
 ## Keputusan terbuka (per 22 Okt 2026; arahan Auditor sudah tercatat di `AUDIT-HANDOFF-2026-10-22-auditor.md`, PIC memperbarui bagian ini saat mengeksekusi)
 
-1. **Kontras kicker** (`.band .kicker`, amber `#E0A458` di atas pita fase): 2,77:1 sampai 4,79:1 di 8 warna pita, gagal
-   4,5:1 di 7 dari 8. Usulan: `#F3DBBC` (amber dicampur putih 60%), minimum 4,52:1 di semua pita.
-2. **Akordeon "Tentang"** (pola tiga repo lain, bagian di bawah) belum diterapkan. Sekarang ada blok "Tentang" di
-   halaman dan footer "Proyek lain" (tautan di luar panel). Menunggu arahan Auditor.
-3. **Daftar resmi** proyek: repo lain belum mencantumkan Kenali Calon.
-4. Klaim yang sumbernya belum jelas: "60-90 menit per sesi" dan "Pertanyaan dihimpun dari berbagai sumber eksternal".
+1. **Kontras kicker** (`.band .kicker`): **selesai, push A (`1d9f403`, 22 Okt 2026)**. Amber `#E0A458` (2,77:1 sampai 4,79:1
+   di 8 warna pita) diganti token `--band-kicker` `#F3DBBC` (minimum 4,52:1). axe 0 pelanggaran dan 0 "perlu cek" di 72
+   audit, jadi cadangan `#F6E4CD` tidak dipakai. Hero `.hero .kicker` tetap amber (lolos).
+2. **Akordeon "Tentang"** (pola di bawah): **belum diterapkan**; arahan Auditor ada (butir 3), dieksekusi di push B. Sekarang
+   masih blok "Tentang" di halaman dan footer "Proyek lain" (tautan di luar panel).
+3. **Daftar resmi**: sudah memuat Kenali Calon (Auditor, 22 Okt 2026). Panel di tiga repo lain dikerjakan PIC masing-masing.
+4. **Klaim UI** (aturan lintas-repo 8), keputusan Auditor 22 Okt 2026, selesai di push A: "18-28" menjadi **"16-28"**
+   (benar di semua peran, dijaga uji dari `PANDUAN_DATA`); "menit per sesi" menjadi **"perkiraan menit per sesi"** (angka
+   60-90 tetap, estimasi pembuat artifact). "Pertanyaan dihimpun dari berbagai sumber eksternal, lalu disusun ulang."
+   dipertahankan: **pernyataan pemilik, sumber tidak disebut, tidak diverifikasi** (Amal boleh menambah daftar sumber).
 
 ## Aturan satu origin dan tautan antarproyek
 
