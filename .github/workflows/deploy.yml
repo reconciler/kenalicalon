@@ -1,0 +1,181 @@
+name: Build & deploy situs (GitHub Pages)
+
+# Situs statis satu halaman (index.html + aset), terbit langsung tiap push ke main.
+# Pola mengikuti catatankajian/deploy.yml (disalin 22 Okt 2026 saat repo dibuat).
+# GitHub Pages source (Settings -> Pages -> Build and deployment) harus
+# "GitHub Actions"; hanya Amal yang bisa mengubahnya (CLAUDE.md, aturan lintas-repo 17).
+# Sebelum Pages diaktifkan, langkah "Siapkan Pages" gagal; aktifkan lalu jalankan ulang run-nya.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Ambil repo
+        uses: actions/checkout@v4
+
+      - name: Siapkan Pages
+        uses: actions/configure-pages@v5
+
+      - name: Susun folder situs (_site/) -- hanya berkas publik
+        run: |
+          set -e
+          mkdir -p _site
+          cp index.html og-image.png favicon.svg robots.txt sitemap.xml _site/
+          cp -r lib _site/lib
+          # Berkas internal (CLAUDE.md, AUDIT-HANDOFF-*.md, COORDINATION-NOTE-*.md,
+          # scripts/, .github/) SENGAJA tidak disalin -- tidak boleh tayang publik.
+
+      - name: Upload artifact situs
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+
+      - name: Terbitkan ke GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Uji otomatis pasca-deploy
+        run: |
+          set -u
+          BASE="${{ steps.deployment.outputs.page_url }}"
+          BASE="${BASE%/}"
+          SHA="${{ github.sha }}"
+          MARKER="Kenali Calon Pasangan"
+          FAILED=0
+
+          # Hanya curl + shell + python3 bawaan runner. Tanpa action pihak ketiga,
+          # tanpa mengirim data apa pun ke pihak lain.
+
+          # 1. Beranda: retry sampai ~2 menit (propagasi cache Pages), lalu wajib
+          #    200 + memuat teks penanda stabil.
+          home_ok=0
+          for i in $(seq 1 12); do
+            code=$(curl -s -o /tmp/home.html -w "%{http_code}" "${BASE}/?v=${SHA}")
+            if [ "$code" = "200" ] && grep -q "$MARKER" /tmp/home.html; then
+              echo "OK  beranda 200 + teks penanda '$MARKER' ditemukan (percobaan $i)"
+              home_ok=1
+              break
+            fi
+            echo "... beranda belum siap (percobaan $i/12, code=$code), tunggu 10 detik"
+            sleep 10
+          done
+          if [ "$home_ok" != "1" ]; then
+            echo "FAIL beranda tidak 200+marker setelah ~2 menit (code terakhir=$code)"
+            FAILED=1
+          fi
+
+          check_url() {
+            local url="$1" expect="$2" desc="$3" code=""
+            for i in 1 2 3; do
+              code=$(curl -s -o /dev/null -w "%{http_code}" "${url}?v=${SHA}")
+              [ "$code" = "$expect" ] && { echo "OK  [$desc] $url -> $code"; return 0; }
+              sleep 5
+            done
+            echo "FAIL [$desc] $url -> $code (diharapkan $expect)"
+            return 1
+          }
+
+          # 2. Setiap berkas langsung di _site/ harus 200 (diambil dari isi _site/
+          #    saat ini, jadi berkas baru otomatis ikut). Untuk tiap subfolder:
+          #    sampel sampai 5 berkas REKURSIF (font ada di lib/fonts/, satu tingkat
+          #    di bawah lib/; sampel non-rekursif akan melewatkannya).
+          while IFS= read -r f; do
+            check_url "${BASE}/${f}" "200" "berkas publik" || FAILED=1
+          done < <(find _site -maxdepth 1 -type f -printf '%f\n')
+          while IFS= read -r d; do
+            dname=$(basename "$d")
+            while IFS= read -r f; do
+              check_url "${BASE}/${f}" "200" "sampel $dname" || FAILED=1
+            done < <(cd _site && find "$dname" -type f | sort | head -5)
+          done < <(find _site -mindepth 1 -maxdepth 1 -type d)
+
+          # 3. Berkas internal WAJIB 404 -- bukti tidak ikut ter-publish.
+          #    CLAUDE.md dan scripts/test_site.js tetap; AUDIT-HANDOFF-*.md dan
+          #    COORDINATION-NOTE-*.md dinamis (glob), seperti catatankajian.
+          INTERNAL_FILES="CLAUDE.md scripts/test_site.js"
+          while IFS= read -r f; do
+            INTERNAL_FILES="$INTERNAL_FILES $f"
+          done < <(find . -maxdepth 1 -type f \( -name 'AUDIT-HANDOFF-*.md' -o -name 'COORDINATION-NOTE-*.md' \) -printf '%f\n')
+          for f in $INTERNAL_FILES; do
+            check_url "${BASE}/${f}" "404" "internal (harus 404)" || FAILED=1
+          done
+
+          # 4. Penjaga klaim (aturan lintas-repo 7 dan 8), murni cek berkas di checkout:
+          #    a) canonical index.html = URL kanonis; b) tidak memuat skrip/stylesheet/
+          #    gambar/iframe dari luar origin dan tanpa url() eksternal di CSS;
+          #    c) tidak ada fetch/XMLHttpRequest/sendBeacon/WebSocket, karena UI
+          #    menyatakan "Jawaban hanya tersimpan di perangkat ini".
+          #    Berjalan setelah terbit: run merah = perbaiki, bukan penahan terbit.
+          python3 - <<'PY' || FAILED=1
+          import re, sys
+          h = open("index.html", encoding="utf-8").read()
+          bad = []
+          c = re.findall(r'<link rel="canonical" href="([^"]*)"', h)
+          if c != ["https://reconciler.github.io/kenalicalon/"]:
+              bad.append("canonical=" + repr(c))
+          for m in re.finditer(r'<(script|link|img|iframe)\b([^>]*)>', h):
+              attrs = m.group(2)
+              if 'rel="canonical"' in attrs:
+                  continue
+              u = re.search(r'\b(?:src|href)="(https?://[^"]*)"', attrs)
+              if u:
+                  bad.append("sumber eksternal dimuat: <" + m.group(1) + "> " + u.group(1))
+          for u in re.findall(r'url\(\s*["\']?(https?://[^)"\']*)', h):
+              bad.append("url() eksternal di CSS: " + u)
+          for api in sorted(set(re.findall(r'\b(fetch|XMLHttpRequest|sendBeacon|WebSocket)\b', h))):
+              bad.append("pemanggilan jaringan di JS: " + api)
+          # d) daftar aset yang DIRUJUK index.html (font/favicon/og-image) untuk dicek 200
+          #    di bawah. Perlu karena uji nomor 2 hanya memeriksa berkas yang ada di
+          #    _site/: berkas yang hilang tapi masih dirujuk tidak akan pernah dicek.
+          refs = set(re.findall(r'url\(\s*["\']?(?!https?:|data:)([^)"\'#?]+)', h))
+          for m in re.finditer(r'<(?:script|link|img)\b([^>]*)>', h):
+              if 'rel="canonical"' in m.group(1):
+                  continue
+              r = re.search(r'\b(?:src|href)="([^"#?]+)"', m.group(1))
+              if r and not re.match(r'(?:https?:|data:|mailto:)', r.group(1)):
+                  refs.add(r.group(1))
+          refs |= set(re.findall(r'<meta property="og:image" content="https://reconciler\.github\.io/kenalicalon/([^"]+)"', h))
+          open("/tmp/refs.txt", "w").write("\n".join(sorted(refs)) + "\n")
+          for b in bad:
+              print("FAIL [penjaga klaim] " + b)
+          if bad:
+              sys.exit(1)
+          print("OK  [penjaga klaim] canonical benar, tanpa sumber eksternal, tanpa panggilan jaringan di JS")
+          PY
+
+          # 5. Setiap aset yang dirujuk index.html harus 200 (daftar dari langkah 4d).
+          if [ -s /tmp/refs.txt ]; then
+            while IFS= read -r r; do
+              [ -n "$r" ] && { check_url "${BASE}/${r}" "200" "aset dirujuk index.html" || FAILED=1; }
+            done < /tmp/refs.txt
+          else
+            echo "FAIL [aset dirujuk] daftar aset kosong (index.html seharusnya merujuk font, favicon, og-image)"
+            FAILED=1
+          fi
+
+          if [ "$FAILED" = "1" ]; then
+            echo ""
+            echo "Uji pasca-deploy GAGAL -- lihat baris FAIL di atas. Jangan dilonggarkan,"
+            echo "selidiki penyebabnya."
+            exit 1
+          fi
+          echo ""
+          echo "Semua uji pasca-deploy lolos. (Catatan: ini tidak menilai tampilan --"
+          echo "tinggi header/font/tata letak tetap perlu dicek manusia.)"

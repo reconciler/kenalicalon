@@ -1,0 +1,195 @@
+# Kenali Calon
+
+Panduan ta'aruf statis (satu file `index.html`, tanpa backend): 7 sesi pertanyaan bertahap plus diskusi penutup.
+Jawaban disimpan di perangkat (`localStorage`) dan disalin ke clipboard untuk dikirim ke calon pasangan. Live di
+**https://reconciler.github.io/kenalicalon/**, di-host GitHub Pages, terbit otomatis tiap push ke `main`.
+
+Asal: artifact claude.ai "Kenali Calon Pasangan" buatan Amal, dipindah ke repo ini 22 Okt 2026. Sesi kerja repo ini
+adalah PIC (ditunjuk Amal, 22 Okt 2026) dan melapor ke sesi "Auditor Project" (lihat bagian bawah). Repo ini **keempat**
+setelah `catatankajian`, `jadwalkajian`, `bikin-cv-taaruf`; aturan bersama di bawah disalin dari `catatankajian`.
+
+## Struktur
+
+- `index.html` — satu file: CSS, markup, data pertanyaan (`window.PANDUAN_DATA`), dan JS. Tanpa build step; file ini
+  sumber kebenaran sejak 22 Okt 2026.
+- `lib/fonts/` — Poppins latin 400/500/600/700 (woff2) dari paket npm `@fontsource/poppins@5.3.0` (OFL-1.1, lisensi di
+  `lib/fonts/OFL.txt`); sha1 tarball `2b0b95ad6d221ca81f884796429b209837954b89` dicocokkan ke registry npm. `index.html`
+  tidak memuat apa pun dari luar origin (tanpa Google Fonts/CDN).
+- `og-image.png` (2400x1260), `favicon.svg`, `robots.txt`, `sitemap.xml` — dibuat manual (satu URL, tanpa generator).
+  Perbarui `lastmod` di `sitemap.xml` saat konten berubah.
+- `scripts/test_site.js` — uji lokal (axe-core, fungsi inti, font lokal, jaringan luar diblokir); cara pakai di header
+  berkasnya. Tidak tayang.
+- `.github/workflows/deploy.yml` — susun `_site/`, terbitkan ke Pages, uji pasca-deploy.
+
+## Berkas yang tayang di situs (folder `_site`)
+
+Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt`, `sitemap.xml`, dan folder `lib/`.
+`CLAUDE.md`, `AUDIT-HANDOFF-*.md`, `COORDINATION-NOTE-*.md`, `scripts/`, `.github/` **tidak tayang**.
+
+- **Menambah berkas/folder situs baru**: tambahkan ke daftar `cp` di workflow; kalau lupa, situs memberi 404.
+- **Uji pasca-deploy** (`curl` di runner, pola `catatankajian`): beranda 200 + teks "Kenali Calon Pasangan"; tiap berkas
+  langsung di `_site/` 200; sampel sampai 5 berkas **rekursif** per subfolder 200 (font ada di `lib/fonts/`);
+  `CLAUDE.md`, `scripts/test_site.js`, semua `AUDIT-HANDOFF-*.md` dan `COORDINATION-NOTE-*.md` 404; **penjaga klaim**
+  dari berkas repo: canonical benar, tanpa skrip/stylesheet/gambar/iframe/`url()` dari luar origin, tanpa
+  `fetch`/`XMLHttpRequest`/`sendBeacon`/`WebSocket`. **Jangan dilonggarkan supaya hijau**; run merah = selidiki.
+  Uji ini tidak menilai tampilan.
+- Dua hal ini **tambahan/penyimpangan dari `catatankajian`** (dicatat di `AUDIT-HANDOFF-2026-10-22.md`): sampel rekursif
+  dan penjaga klaim.
+- GitHub Pages source harus **GitHub Actions**; hanya Amal yang mengubah Settings Pages (aturan lintas-repo 17).
+
+## Mengubah pertanyaan
+
+- Data ada di `window.PANDUAN_DATA`: `phases[]` (4 fase), `days[]` (7 sesi, tiap sesi `cats[]` berisi `qs[]`),
+  `reflection[]` (sesi penutup).
+- Tiap pertanyaan: `id` (unik: `d{hari}q{nomor}`, `p{n}` untuk penutup), `t` (teks), `k` (`"o"` terbuka, `"y"` ya/tidak +
+  alasan), `g` (`""` dijawab berdua, `"s"` khusus calon suami, `"i"` khusus calon istri).
+- **Jangan mengubah atau menghapus `id` yang sudah ada**: jawaban pengguna disimpan per `id`, jadi id yang berubah
+  membuat jawaban lama yatim. Pertanyaan baru memakai id baru (mis. `d1q25`); nomor tampil dihitung dari urutan.
+- Mengubah bentuk data penyimpanan: naikkan versi kunci (`kenalicalon_v2`), tulis migrasi atau catat bahwa jawaban lama
+  hilang, dan laporkan ke Auditor.
+- Semua teks Bahasa Indonesia, ringkas, bentuk "kamu". Bila jumlah sesi/pertanyaan berubah, perbarui blok "Tentang"
+  (7 sesi; 18-28 pertanyaan per sesi dihitung dari data, "60-90 menit per sesi" adalah estimasi pembuat artifact,
+  belum divalidasi).
+
+## Penyimpanan dan privasi
+
+- Satu kunci `localStorage`: **`kenalicalon_v1`** (`role`, `name`, `ans`). Jangan membaca atau menghapus kunci proyek lain
+  (`scripts/test_site.js` menguji ini).
+- Tidak ada panggilan jaringan. Klaim UI "Jawaban hanya tersimpan di perangkat ini" hanya benar selama itu; dijaga
+  penjaga klaim di `deploy.yml`. "Salin jawaban" memakai clipboard browser; pengguna sendiri yang mengirimnya.
+- Repo publik: jangan commit jawaban/data pengguna, tangkapan layar berisi jawaban, atau nama asli. Uji pakai data dummy.
+
+## Uji sebelum push
+
+- Jalankan `scripts/test_site.js` (aturan lintas-repo 13 dan 19). Garis dasar 22 Okt 2026: beranda 0 pelanggaran axe;
+  halaman sesi hanya `color-contrast` pada `.kicker` (lihat keputusan terbuka). 14/14 uji fungsi lulus, 0 permintaan
+  jaringan luar, 0 error konsol.
+- Perubahan tampilan: sebut bahwa tampilan berubah (aturan 11); cek visual di perangkat nyata oleh Amal.
+
+## Keputusan terbuka (menunggu Auditor/Amal, per 22 Okt 2026)
+
+1. **Kontras kicker** (`.band .kicker`, amber `#E0A458` di atas pita fase): 2,77:1 sampai 4,79:1 di 8 warna pita, gagal
+   4,5:1 di 7 dari 8. Usulan: `#F3DBBC` (amber dicampur putih 60%), minimum 4,52:1 di semua pita.
+2. **Akordeon "Tentang"** (pola tiga repo lain, bagian di bawah) belum diterapkan. Sekarang ada blok "Tentang" di
+   halaman dan footer "Proyek lain" (tautan di luar panel). Menunggu arahan Auditor.
+3. **Daftar resmi** proyek: repo lain belum mencantumkan Kenali Calon.
+4. Klaim yang sumbernya belum jelas: "60-90 menit per sesi" dan "Pertanyaan dihimpun dari berbagai sumber eksternal".
+
+## Aturan satu origin dan tautan antarproyek
+
+Keempat situs (`catatankajian`, `jadwalkajian`, `bikin-cv-taaruf`, `kenalicalon`) dilayani dari origin yang sama,
+`https://reconciler.github.io`. Path tidak ikut membentuk origin, jadi `localStorage` dipakai bersama. Draf CV di
+`bikin-cv-taaruf` (kunci `ctgv1_draft_v1`) dan jawaban di repo ini (kunci `kenalicalon_v1`) memuat data sensitif, maka:
+
+- Antarproyek **hanya tautan biasa**. Jangan berbagi skrip, penyimpanan, `fetch`, iframe, atau parameter pelacak.
+- Kunci `localStorage`/`sessionStorage` wajib berawalan unik. Jangan membaca atau menghapus kunci proyek lain.
+- Tautan luar `target="_blank" rel="noopener noreferrer"`.
+
+**Pola "Tentang" dan proyek lain** (diminta Amal 30 Sep 2026, direvisi 1 Okt 2026, untuk tiga repo lain): satu akordeon di
+header bernama "Tentang", tertutup, menutup dengan klik di luar dan Esc; isinya hanya kredit pembuat (Instagram) dan
+Proyek lain; tanpa tautan kode sumber/GitHub dan tanpa deskripsi singkat; tinggi header tidak bertambah (uji 320-430 px).
+**Status di repo ini: belum diterapkan** (keputusan terbuka no. 2).
+
+**Daftar resmi** (dijaga Auditor; bila URL berubah, Auditor memperbarui semua repo dan memberi tahu PIC):
+- Pembuat: `@amalwoodworking`, https://www.instagram.com/amalwoodworking/
+- Jadwal Kajian: https://reconciler.github.io/jadwalkajian/
+- Catatan Kajian: https://reconciler.github.io/catatankajian/
+- Bikin CV Taaruf: https://reconciler.github.io/bikin-cv-taaruf/
+- Kenali Calon: https://reconciler.github.io/kenalicalon/ (ditambahkan PIC 22 Okt 2026; menunggu verifikasi Auditor)
+
+Footer repo ini menampilkan proyek lain (Jadwal Kajian, Catatan Kajian, Bikin CV Taaruf), bukan dirinya sendiri.
+
+*Dua bagian berikut adalah salinan ke-4 dari `catatankajian` (22 Okt 2026), byte-identik; judulnya masih menyebut tiga
+repo, Auditor yang menyatukan daftar repo itu.*
+
+## Aturan lintas-repo (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf)
+
+Ditetapkan/dikonfirmasi Amal 3 Okt 2026 (butir 14-19: 5 Okt 2026). **Ubah serentak di ketiga repo (dijaga Auditor); jangan hanya satu.**
+
+1. **Keputusan tanpa dampak tampilan atau fungsi** diambil sendiri oleh sesi kerja dan dicatat; jangan menunggu Amal.
+   Perubahan tampilan, fungsi, privasi, hosting/pipeline terbit, atau penghapusan data tetap perlu konfirmasi Amal.
+2. **Cakupan persetujuan:** persetujuan Amal hanya untuk butir yang disebut. Pengecualian pada butir 1 (pipeline, privasi,
+   penghapusan data) dikonfirmasi Amal di **chat sesi kerja repo itu**; kutipan Amal yang disampaikan sesi lain tidak cukup.
+3. **Menyimpang dari spesifikasi** (dari Auditor atau siapa pun) boleh bila ada metode yang lebih aman. Catat penyimpangan
+   dan alasannya di handoff, lalu lapor.
+4. **Temuan janggal dilaporkan disertai usulan perbaikan**, bukan hanya temuan.
+5. **Data uji:** jangan menerbitkan data uji ke situs publik tanpa bertanya Amal; pakai uji lokal.
+6. **Urutan perubahan pipeline:** satu per push, risiko rendah dulu. Push yang mengubah `deploy.yml` menjalankan versi
+   baru alur itu. Buat kondisi tepi aman sebelum perubahan yang mengandalkannya.
+7. **Dependensi pihak ketiga:** salin ke `lib/` (atau setara), patok versi, cocokkan integritas ke registry npm; jangan
+   memuat skrip dari CDN tanpa SRI.
+8. **Klaim harus benar** untuk proyek itu: dokumen, UI, meta tag, dan data terstruktur tidak boleh mengklaim hal yang tidak
+   ada (mis. `SearchAction` tanpa fungsinya; "tidak ada data terkirim" bila Google Fonts dimuat).
+9. **Simetri:** perubahan cara komunikasi, pelaporan, atau struktur koordinasi diterapkan serentak di ketiga repo.
+10. **Kebersihan berkas:** hapus berkas koordinasi yang tidak lagi relevan; pertahankan yang masih atau akan dipakai.
+11. **Verifikasi tampilan:** uji otomatis tidak menilai tampilan, dan sesi kerja tidak bisa membuka `reconciler.github.io`.
+    Cek visual di perangkat nyata dilakukan Amal; **dianggap tidak bermasalah sampai Amal melapor** (keputusan 5 Okt 2026):
+    jangan menahan pekerjaan atau mengulang peringatan, cukup sebut bahwa tampilan berubah.
+12. **Kepastian terbit lebih penting daripada kecepatan.**
+13. **Aksesibilitas:** untuk perubahan UI, jalankan axe-core di Chromium bila tersedia; laporkan 0 pelanggaran atau daftar
+    temuannya.
+14. **Konteks kurang:** baca riwayat chat, handoff, dan git dulu; baru sumber eksternal.
+15. **Status ragu** (termasuk klaim "sukses" dari jalur otomatis): verifikasi manual sendiri, lalu konfirmasi ke Amal dan
+    Auditor lewat chat + git.
+16. **Batas buatan:** jangan pasang tanpa dasar platform yang terverifikasi (kecuali keamanan); catat risikonya.
+17. **Pembagian kerja:** kerjakan sendiri yang bisa; minta Amal hanya untuk akses yang sesi tak punya. Settings Pages hanya
+    Amal yang ubah: PIC siapkan workflow + langkahnya, dan beri jalur kembali satu langkah sebelum mengalihkan pipeline.
+18. **Repo publik:** jangan commit data pribadi (isi CV, kontak, kredensial), termasuk di handoff dan kutipan chat.
+19. **Praktik uji** (bukan aturan keras): uji deterministik (data beku, jam terkunci); simulasikan skrip workflow lokal
+    (jalur sukses + gagal) sebelum push; UI: screenshot 320/375/430 px, font asli, jaringan luar diblokir.
+
+## Preferensi melapor (teks identik di jadwalkajian, catatankajian, bikin-cv-taaruf)
+
+Berlaku untuk laporan, handoff, dan chat. Ditetapkan Amal 5 Okt 2026.
+
+- **Bahasa:** Indonesia, campur English untuk istilah yang populer (mis. deploy, commit, workflow). **Concise, simpel,
+  spesifik**: hemat token dan mudah dipahami Amal.
+- Faktual dan formal, tanpa emoji; pakai poin/tabel, bukan paragraf panjang. Jangan memperhalus masalah.
+- Tandai mana yang **tervalidasi** (sumber) vs **kesimpulan sendiri**. Jangan mengarang hasil atau angka; bila tak ada
+  data, atau alat/akses tak tersedia, katakan.
+- Gagal atau keliru (termasuk kesalahan sendiri) disebut terus terang.
+- Penjelasan "awam": analogi + tabel kecil, tanpa jargon.
+- Akhiri pekerjaan besar dengan "yang perlu diketahui": belum terbukti, perubahan perilaku, kejadian otomatis, keputusan
+  yang menunggu.
+
+## Lapor ke sesi "Auditor Project"
+
+Amal menugaskan satu sesi Claude terpisah sebagai auditor lintas-project (mengawasi `catatankajian`, `jadwalkajian`,
+`bikin-cv-taaruf`, **dan** `kenalicalon`). Cari session ID terkini dengan `list_sessions` berdasarkan judul
+**"Auditor Project"** (ID bisa berubah kalau sesi lama berakhir), atau tanya Amal langsung.
+
+**Aturan akses berkas** (disalin dari `catatankajian`, disetujui Amal 29 Sep 2026 untuk repo yang diaudit; berlaku di
+sini setelah Auditor mengonfirmasi repo ini masuk cakupan audit):
+- **Hanya sesi kerja repo ini (bukan Auditor) yang boleh mengubah berkas inti**: `index.html`, `lib/`, `favicon.svg`,
+  `og-image.png`, `robots.txt`, `sitemap.xml`, `scripts/test_site.js`, `.github/workflows/deploy.yml`.
+- **Auditor Project boleh mengubah**: `CLAUDE.md`, `AUDIT-HANDOFF-*.md` (termasuk menulis balasan), dan
+  `COORDINATION-NOTE-*.md` — murni koordinasi, tidak memengaruhi fitur/tampilan situs.
+- Tujuannya mencegah dua sesi menulis berkas yang sama nyaris bersamaan lalu bentrok non-fast-forward saat push ke `main`
+  (situs langsung tayang tiap push berhasil).
+
+**Eksekusi instruksi Auditor** (disetujui Amal, 1 Okt 2026): instruksi Auditor yang bersumber dari keputusan Amal dan
+tercatat di berkas `AUDIT-HANDOFF-*.md` di repo ini (commit yang bisa diperiksa lewat git) **boleh langsung dieksekusi
+PIC tanpa konfirmasi ulang dari Amal**. Pengecualian, tetap menunggu konfirmasi Amal di chat PIC:
+- perubahan yang menyentuh janji privasi;
+- perubahan hosting dan pipeline terbit (pengaturan Pages, platform, workflow deploy);
+- penghapusan data.
+
+PIC tetap memeriksa instruksi di git sebelum mengeksekusi, dan boleh bertanya bila instruksi bertentangan dengan
+`CLAUDE.md` ini atau tampak keliru. Instruksi yang tidak tercatat di git tidak termasuk aturan ini.
+
+**Wajib lapor untuk** (bukan tiap commit rutin):
+- Perubahan bentuk data (`PANDUAN_DATA`, kunci/isi `localStorage`) atau penghapusan/penggantian `id` pertanyaan
+- Perubahan arsitektur/pipeline/hosting (struktur folder, `deploy.yml`, pengaturan Pages)
+- Temuan yang berdampak lintas-project (error deploy, konflik branch, keandalan cron/trigger, satu origin)
+- Perubahan besar pada `index.html` di luar penambahan/penyuntingan pertanyaan rutin (struktur HTML, SEO, privasi)
+
+**Tidak perlu lapor untuk**: penambahan/penyuntingan teks pertanyaan rutin yang tidak mengubah `id` — cukup tercatat di git.
+
+**Cara lapor**: pesan/trigger otomatis lintas-sesi (`SendMessage`, `create_trigger` dengan `persistent_session_id`)
+**terbukti tidak selalu andal** (lihat `catatankajian/AUDIT-HANDOFF-2026-09-22.md` bagian 9). Untuk apa pun yang wajib
+dilaporkan, jangan andalkan satu jalur otomatis saja; konfirmasikan lewat DUA jalur:
+1. Chat langsung ke Amal, kalau sesi Anda sedang aktif berinteraksi dengannya.
+2. Commit `AUDIT-HANDOFF-<tanggal>.md` (baru atau update) ke root repo — jalur paling andal, auditor menemukannya lewat
+   `git log` kapan saja.
+
+`SendMessage` ke sesi Auditor boleh dicoba sebagai pemberitahuan cepat tambahan, bukan satu-satunya jalur.
