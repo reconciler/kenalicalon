@@ -14,10 +14,11 @@ sesi ini. **[Usulan]** = kesimpulan/usulan PIC, belum diputuskan siapa pun.
   melapor ke Auditor, lalu menyesuaikan sesuai arahan Auditor "tanpa perlu konfirmasi ke saya".
   **[Usulan]** pengecualian di `CLAUDE.md` (privasi, pipeline/Pages, penghapusan data tetap konfirmasi Amal) dianggap
   **tetap berlaku**, karena kalimat Amal tidak menyebutnya. Mohon Auditor menegaskan.
-- **Status terbit: BELUM tayang.** [Terverifikasi] Run Actions #1 (push `ef5c2d6`) gagal di langkah "Siapkan Pages":
-  `Get Pages site failed ... Pages enabled and configured to build using GitHub Actions`. Pages belum diaktifkan, dan
-  Settings Pages hanya Amal yang boleh ubah (aturan lintas-repo 17).
-  **Menunggu Amal:** Settings → Pages → Build and deployment → Source = **GitHub Actions**. Setelah itu PIC re-run run #1.
+- **Status terbit: TAYANG** di https://reconciler.github.io/kenalicalon/ (diperbarui setelah Amal mengaktifkan Pages).
+  [Terverifikasi] Run #1 (push `ef5c2d6`) gagal di "Siapkan Pages" (`Get Pages site failed ... Pages enabled and
+  configured to build using GitHub Actions`). Amal lalu mengubah Settings → Pages → Source = **GitHub Actions** (aturan
+  lintas-repo 17: hanya Amal). Run #2 (push `d79d81b`) **success**; log runner memuat 21 pengecekan OK (rincian di 4).
+  Tampilan live belum dilihat siapa pun (aturan 11).
 
 ## 2. Kronologi singkat (semua [Terverifikasi])
 
@@ -26,7 +27,8 @@ sesi ini. **[Usulan]** = kesimpulan/usulan PIC, belum diputuskan siapa pun.
 | `create_repository` lewat integrasi GitHub | **Ditolak 403** "Resource not accessible by integration" |
 | `add_repo` sebelum repo ada | "not found / no access" |
 | Amal membuat repo kosong `reconciler/kenalicalon` (publik, `main`) | `add_repo` + clone berhasil setelahnya |
-| Commit `ef5c2d6` ke `main` (13 berkas) | Terdorong; run #1 terpicu, gagal di Pages (lihat atas) |
+| Commit `ef5c2d6` ke `main` (13 berkas) | Terdorong; run #1 terpicu, gagal di "Siapkan Pages" (Pages belum aktif) |
+| Commit `d79d81b` (handoff awal), setelah Amal mengaktifkan Pages (Source = GitHub Actions) | Run #2 success; situs tayang |
 
 ## 3. Perubahan dibanding artifact (semua [Terverifikasi] di diff/uji)
 
@@ -52,9 +54,11 @@ tiap satu di-assert tepat 1 kecocokan, ditambah blok `@font-face` dan shell HTML
 | Integritas font | sha1 tarball `@fontsource/poppins@5.3.0` = registry npm (`2b0b95ad…`), OFL-1.1 |
 | Simulasi langkah uji pasca-deploy lokal | Sukses: exit 0. Gagal (font hilang, `CLAUDE.md` bocor, skrip CDN, `fetch`): semua exit 1 |
 | Bagian bersama `CLAUDE.md` vs `catatankajian` | `diff` byte-identik (50 baris) |
+| Terbit live, dari log run #2 di runner GitHub (`curl` ke situs publik) | 21 OK: beranda 200 + teks penanda; 5 berkas publik 200; 5 berkas `lib/fonts/` 200; `CLAUDE.md`, `scripts/test_site.js`, `AUDIT-HANDOFF-2026-10-22.md` 404; penjaga klaim OK; 6 aset yang dirujuk `index.html` 200 |
 
-**Belum terbukti:** tampil di perangkat nyata/iOS Safari (aturan 11: dianggap OK sampai Amal melapor), perilaku clipboard di
-Safari/WhatsApp, hasil terbit live (egress ke `reconciler.github.io` diblokir, http 000; verifikasi lewat log Actions).
+**Belum terbukti:** tampil di perangkat nyata/iOS Safari (aturan 11: dianggap OK sampai Amal melapor) dan perilaku clipboard
+di Safari/WhatsApp. Uji pasca-deploy tidak menilai tampilan. Sesi ini tidak bisa membuka `reconciler.github.io` (http 000),
+jadi bukti terbit hanya dari log Actions.
 
 ## 5. Penyimpangan dari pola repo lain
 
@@ -95,8 +99,8 @@ Safari/WhatsApp, hasil terbit live (egress ke `reconciler.github.io` diblokir, h
 
 ## 8. Yang perlu diketahui
 
-- **Belum tayang** sampai Amal mengubah Source Pages; push berikutnya akan memicu run yang gagal di langkah yang sama
-  sampai itu dilakukan. Perubahan hanya-dokumen (seperti handoff ini) ikut memicu run karena deploy berjalan tiap push.
+- **Kejadian otomatis:** deploy berjalan tiap push ke `main`, termasuk perubahan hanya-dokumen (seperti pembaruan handoff
+  ini). Situs sudah publik dan boleh diindeks mesin pencari (`robots.txt` mengizinkan); isinya pertanyaan, tanpa data pengguna.
 - **Perubahan perilaku vs artifact:** jawaban yang sudah ditulis di versi artifact tidak terbawa (origin berbeda dan kunci
   penyimpanan baru).
-- **Keputusan menunggu:** Amal (Source Pages); Auditor (7a-7e).
+- **Keputusan menunggu:** Auditor (7a-7e). Perubahan tampilan (6.1, 7b) dieksekusi PIC hanya setelah arahan Auditor tercatat di git.
