@@ -108,3 +108,33 @@ Tidak ada tindakan. Daftar id: d1q4, d1q6, d1q7, d1q8, d1q9, d1q10, d1q11, d1q12
 ## 6. Batas
 
 Pemetaan berdasarkan teks pertanyaan, bersifat penilaian Auditor (bukan pencocokan kata). Filter peran (suami/istri) dan kolom bersyarat CV mengurangi jumlah yang dilihat satu pengguna. Perubahan apa pun menunggu keputusan Amal.
+
+## 7. Keputusan Amal 25 Okt 2026: opsi C (ramping-kan CV); dampak untuk Kenali Calon
+
+- **[Keputusan Amal]** 25 Okt 2026 (chat Auditor): "Lakukan opsi C". Yang berubah ada di CV (repo `bikin-cv-taaruf`): 20 kolom pandangan dan rencana dihapus dari CV karena topiknya sudah ada di Kenali Calon.
+- **Tidak ada perubahan wajib di repo ini.** Tetapi 20 pertanyaan di bawah menjadi **satu-satunya tempat** topiknya. **Jangan menghapus atau mengubah artinya** tanpa koordinasi dengan Auditor (aturan `id` tidak berubah tetap berlaku).
+
+| ID Kenali Calon | Topik (dulu juga ada di CV) | Kolom CV yang dihapus |
+|---|---|---|
+| d3q2 | Apa tujuan dan rencana hidupmu, termasuk karier, dalam 5–10 tahun ke… | L.06 |
+| d3q3 | Apa tujuan dan motivasi utamamu menikah? Kenapa sekarang, dan apa yan… | K.01 |
+| d3q6 | Seperti apa gambaran keluarga ideal yang ingin kamu bangun? | K.02 |
+| d3q7 | Apa indikator rumah tangga yang sukses? Pencapaian apa yang ingin dir… | K.02 |
+| d3q9 | Seperti apa pasangan idealmu (fisik dan non-fisik)? Karakter apa yang… | M.02, M.05 |
+| d3q10 | Non-starters: hal apa yang membuatmu langsung berhenti di tahap perke… | M.01 |
+| d3q12 | Seberapa siap kamu menikah? Bagaimana persiapan fisik, personal, ment… | J.01, J.02, J.03, J.04 |
+| d3q15 | Bagaimana pandanganmu soal mahar? | L.03 |
+| d3q16 | Konsep acara sederhana atau resepsi besar? Siapa yang menanggung biay… | L.01, L.02 |
+| d4q16 | Apa saja peran dan tugas ideal suami dan istri menurutmu? | L.05 |
+| d4q23 | Sejauh apa kamu akan bertahan dalam pernikahan? Apa dealbreaker-mu (h… | M.01 |
+| d4q24 | Bagaimana pandanganmu soal poligami? | G.12 |
+| d5q9 | Seperti apa gambaran belanja dan alokasi keuangan rumah tangga? Dikel… | L.09 |
+| d5q19 | Bagaimana pandanganmu tentang istri bekerja setelah menikah, termasuk… | L.07 |
+| d5q22 | Bagaimana kamu membagi waktu antara kerja dan keluarga? | L.06 |
+| d6q2 | Setelah menikah, ingin tinggal di kota mana? | L.04 |
+| d6q3 | Rumah sendiri, sewa, atau tinggal bersama ortu/mertua? | L.04 |
+| d6q4 | Bagaimana pembagian pekerjaan rumah yang kamu harapkan? | L.05 |
+| d7q5 | Berapa jumlah anak yang diinginkan, dan berapa jarak usia idealnya? | L.08 |
+| d7q23 | Bagaimana pandanganmu tentang pendidikan formal anak (sekolah umum, s… | L.08 |
+
+- Pertanyaan Kenali Calon yang masih mengulang CV turun dari 44 jadi 24 (umumnya fakta dan kebiasaan). Sisanya baru dibahas bila Amal memilih opsi A atau B di bagian 3; **belum ada keputusan**.
