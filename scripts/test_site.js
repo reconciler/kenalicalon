@@ -12,6 +12,7 @@
 // #copy-btn, #clear-open/#clear-yes. Ubah bersama bila UI berubah.
 const { chromium } = require("playwright-core");
 const fs = require("fs");
+const crypto = require("crypto");
 const path = require("path");
 const axeSrc = fs.readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 
@@ -29,13 +30,31 @@ const MODES = [
   { name: "tema-terang-manual", scheme: "dark", theme: "light" },
 ];
 
-// KC_ONLY=<bagian,...> menjalankan sebagian saja (axe, metrics, claims, about, core); kosong = semua.
+// KC_ONLY=<bagian,...> menjalankan sebagian saja (axe, metrics, claims, about, data, legacy, core); kosong = semua.
 // KC_ONLY=metrics saja = hanya ukur tinggi (cepat), untuk membuat baseline. KC_BASELINE=<hasil.json>: bandingkan tinggi.
 const ONLY = (process.env.KC_ONLY || "").split(",").filter(Boolean);
 const want = (name) => ONLY.length === 0 || ONLY.includes(name);
 const ONLY_METRICS = ONLY.length === 1 && ONLY[0] === "metrics";
 // sesi yang juga diaudit axe dengan panel "Tentang" terbuka
 const OPEN_PANEL_KEYS = new Set(["hari1", "hari4", "hari7", "penutup"]);
+// --- penjaga data pertanyaan (Auditor 25 Okt 2026, bagian 8; keputusan Amal opsi C) ---
+// 20 pertanyaan = satu-satunya tempat topik yang dihapus dari CV; 7 "Pertahankan". Teks 27 id ini tidak boleh berubah
+// tanpa koordinasi Auditor (sha256 dari "id<TAB>teks" terurut, dihitung 25 Okt 2026 sebelum perubahan apa pun).
+const PROTECTED_20 = ["d3q2", "d3q3", "d3q6", "d3q7", "d3q9", "d3q10", "d3q12", "d3q15", "d3q16", "d4q16", "d4q23", "d4q24", "d5q9", "d5q19", "d5q22", "d6q2", "d6q3", "d6q4", "d7q5", "d7q23"];
+const KEEP_7 = ["d1q22", "d2q11", "d3q20", "d4q7", "d5q5", "d5q6", "d6q1"];
+const SHA_27 = "d57fdac07c6356f9343f7476e2bb335462c830c7d91a3ef4eaf060a470f2761d";
+// teks akhir pertanyaan yang diubah (id tetap); ubah di sini bersama index.html
+const CHANGED_TEXT = {
+  "d1q1": "Bagaimana kamu menyikapi kelebihan dan kekuranganmu?",
+  "d2q8": "Selain ortu, siapa tempatmu meminta pendapat (teman, guru, ustadz, murabbi), dan bagaimana pandanganmu tentang mereka?",
+  "d2q13": "Adakah penyakit keturunan dalam keluarga?",
+  "d2q15": "Pernahkah kamu bertunangan atau berpacaran, dan seperti apa interaksimu dengan lawan jenis selama ini? Bagaimana pendapatmu tentang pacaran?",
+  "d2q17": "Bagaimana hubunganmu dengan ortu dan saudara? Apa yang paling berkesan dari ibu dan bapakmu?",
+  "d3q14": "Berapa waktu ideal dari ta'aruf menuju pernikahan?",
+  "d5q15": "Bagaimana pandanganmu tentang hutang dalam rumah tangga?"
+};
+const RETIRED = []; // id pensiun (Tahap B), tidak dipakai ulang
+const TOTAL = 174 - RETIRED.length;
 
 const results = { axe: [], external: [], console: [], checks: [], metrics: {}, metricsSession: {} };
 const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, detail: detail || "" });
@@ -262,6 +281,73 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
     }
   }
 
+  // --- data pertanyaan: id, total, teks terlindungi, teks akhir, rujukan menggantung
+  if (want("data")) {
+    const { ctx, page } = await newPage(430, "light");
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const D = await page.evaluate(() => window.PANDUAN_DATA);
+    const all = [...D.days.flatMap((d) => d.cats.flatMap((c) => c.qs)), ...D.reflection];
+    const byId = Object.fromEntries(all.map((q) => [q.id, q]));
+    ok(`id unik dan bertipe benar (total ${TOTAL})`, all.length === TOTAL && new Set(all.map((q) => q.id)).size === all.length && all.every((q) => /^(d[1-7]q\d+|p\d)$/.test(q.id) && typeof q.t === "string" && q.t && ["o", "y"].includes(q.k) && ["", "s", "i"].includes(q.g)), `jumlah=${all.length}`);
+    ok("20 pertanyaan dilindungi + 7 'Pertahankan' ada dan teksnya tidak berubah (sha256)", [...PROTECTED_20, ...KEEP_7].every((i) => byId[i]) &&
+      crypto.createHash("sha256").update([...PROTECTED_20, ...KEEP_7].sort().map((i) => i + "\t" + (byId[i] || {}).t).join("\n")).digest("hex") === SHA_27, "teks salah satu dari 27 id berubah");
+    ok("teks akhir pertanyaan yang diubah sesuai (id tetap)", Object.entries(CHANGED_TEXT).every(([i, t]) => byId[i] && byId[i].t === t), JSON.stringify(Object.entries(CHANGED_TEXT).filter(([i, t]) => !byId[i] || byId[i].t !== t).map((x) => x[0])));
+    ok("d5q15 berjenis terbuka (k=o); d2q13 tetap ya/tidak", byId.d5q15 && byId.d5q15.k === "o" && byId.d2q13 && byId.d2q13.k === "y");
+    ok(`id pensiun (${RETIRED.length}) tidak ada di data`, RETIRED.every((i) => !byId[i]), JSON.stringify(RETIRED.filter((i) => byId[i])));
+    // kata rujukan ("tersebut/tadi/di atas/sebelumnya") hanya boleh pada id yang rujukannya masih ada
+    const deictic = all.filter((q) => /\b(tersebut|tadi|di atas|sebelumnya)\b/i.test(q.t)).map((q) => q.id).sort();
+    const expectDeictic = RETIRED.length ? ["d7q8"] : ["d5q17", "d7q8"]; // d5q17 menunjuk d5q16; d7q8 menunjuk d7q7
+    ok("rujukan menggantung: hanya id yang rujukannya masih ada", JSON.stringify(deictic) === JSON.stringify(expectDeictic), JSON.stringify(deictic));
+    await ctx.close();
+  }
+
+  // --- jawaban lama di localStorage (pertanyaan berubah jenis/teks, id pensiun, id yatim); data dummy
+  if (want("legacy")) {
+    const legacy = {
+      role: "semua", name: "Uji",
+      ans: {
+        d1q1: { t: "jawaban lama d1q1" },
+        d2q13: { yn: "tidak" },
+        d5q14: { t: "jawaban d5q14" },
+        d5q15: { yn: "ya", t: "alasan lama hutang" },
+        d5q16: { yn: "ya", t: "jawaban d5q16" },
+        d2q27: { yn: "tidak", t: "jawaban d2q27" },
+        d9q99: { t: "id yatim" },
+      },
+    };
+    const { ctx, page } = await newPage(430, "light");
+    const c0 = results.console.length;
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    await page.evaluate((v) => localStorage.setItem("kenalicalon_v1", JSON.stringify(v)), legacy);
+    await page.goto(`${BASE}#hari5`, { waitUntil: "networkidle" });
+    await page.reload({ waitUntil: "networkidle" });
+    const done = await page.locator(".q.done").evaluateAll((els) => els.map((e) => e.getAttribute("data-id")).sort());
+    const expectDone = ["d5q14", "d5q15"].concat(RETIRED.includes("d5q16") ? [] : ["d5q16"]).sort();
+    const nQ = await page.locator(".q").count();
+    const tb = (await page.locator("#tb-count").innerText()).trim();
+    ok("jawaban lama: halaman termuat, kartu 'done' = jawaban yang valid", JSON.stringify(done) === JSON.stringify(expectDone), JSON.stringify({ done, expectDone }));
+    ok("jawaban lama: hitungan progres cocok dengan kartu", tb === `${done.length}/${nQ}`, `${tb} vs ${done.length}/${nQ}`);
+    ok("jawaban lama d5q15: teks tampil, tanpa tombol Ya/Tidak (jenis kini terbuka)", (await page.locator("#ta-d5q15").inputValue()) === "alasan lama hutang" && (await page.locator('#q-d5q15 [data-yn]').count()) === 0);
+    await page.click("#copy-btn"); await page.waitForTimeout(300);
+    const clip = await page.evaluate(() => navigator.clipboard.readText());
+    ok("salin: memuat jawaban d5q15 tanpa awalan 'Ya.' (yn diabaikan)", clip.includes("Jawaban Uji: alasan lama hutang") && !clip.includes("Ya. alasan lama hutang"), clip.slice(0, 200).replace(/\n/g, " | "));
+    ok("salin: jawaban id pensiun tidak ikut; id lain tetap", RETIRED.includes("d5q16") ? !clip.includes("jawaban d5q16") : clip.includes("jawaban d5q16"), "");
+    // yn saja pada pertanyaan yang kini terbuka tidak dihitung; pada pertanyaan ya/tidak tetap dihitung
+    await page.evaluate((v) => localStorage.setItem("kenalicalon_v1", JSON.stringify(Object.assign({}, v, { ans: { d5q15: { yn: "ya" }, d2q13: { yn: "tidak" } } }))), legacy);
+    await page.reload({ waitUntil: "networkidle" });
+    ok("yn saja pada d5q15 (jenis terbuka) tidak dihitung terjawab", (await page.locator("#q-d5q15.done").count()) === 0);
+    await page.goto(`${BASE}#hari2`, { waitUntil: "networkidle" }); await page.reload({ waitUntil: "networkidle" });
+    ok("yn saja pada d2q13 (jenis ya/tidak) tetap dihitung terjawab", (await page.locator("#q-d2q13.done").count()) === 1);
+    // id pensiun / yatim tidak merusak halaman beranda; hapus semua bekerja
+    await page.evaluate((v) => localStorage.setItem("kenalicalon_v1", JSON.stringify(v)), legacy);
+    await page.goto(BASE, { waitUntil: "networkidle" }); await page.reload({ waitUntil: "networkidle" });
+    await page.click("#clear-open"); await page.click("#clear-yes");
+    const after = await page.evaluate(() => JSON.parse(localStorage.getItem("kenalicalon_v1")));
+    ok("hapus semua membersihkan jawaban lama (termasuk id pensiun dan yatim)", Object.keys(after.ans).length === 0);
+    ok("tanpa galat konsol saat memuat jawaban lama", results.console.length === c0, JSON.stringify(results.console.slice(c0)));
+    await ctx.close();
+  }
+
   // --- fungsi inti (430px, terang)
   if (want("core")) {
     const { ctx, page } = await newPage(430, "light");
@@ -337,7 +423,8 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
       deltas[w] = { docBeranda: b.doc - a.doc };
       const sa = base.metricsSession && base.metricsSession[w], sb = results.metricsSession[w];
       if (sa && sb) {
-        ok(`tinggi topbar, pita, dan halaman sesi (Hari 1) = baseline (${w}px)`, sa.topbar === sb.topbar && sa.band === sb.band && sa.doc === sb.doc, `${JSON.stringify(sa)} -> ${JSON.stringify(sb)}`);
+        ok(`tinggi topbar dan pita sesi (Hari 1) = baseline (${w}px)`, sa.topbar === sb.topbar && sa.band === sb.band, `${JSON.stringify(sa)} -> ${JSON.stringify(sb)}`);
+        deltas[w].docSesiHari1 = sb.doc - sa.doc; // informasional: berubah bila teks pertanyaan berubah
       }
     }
     results.docHeightDelta = deltas;
