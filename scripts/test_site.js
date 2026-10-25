@@ -51,9 +51,12 @@ const CHANGED_TEXT = {
   "d2q15": "Pernahkah kamu bertunangan atau berpacaran, dan seperti apa interaksimu dengan lawan jenis selama ini? Bagaimana pendapatmu tentang pacaran?",
   "d2q17": "Bagaimana hubunganmu dengan ortu dan saudara? Apa yang paling berkesan dari ibu dan bapakmu?",
   "d3q14": "Berapa waktu ideal dari ta'aruf menuju pernikahan?",
-  "d5q15": "Bagaimana pandanganmu tentang hutang dalam rumah tangga?"
+  "d5q15": "Bagaimana pandanganmu tentang hutang dalam rumah tangga?",
+  "d5q17": "Bersediakah jika pasangan punya kewajiban membiayai ortu atau saudaranya (cicilan, biaya sekolah)?"
 };
-const RETIRED = []; // id pensiun (Tahap B), tidak dipakai ulang
+const RETIRED = ["d1q2", "d1q3", "d1q5", "d1q21", "d2q22", "d2q25", "d2q27", "d2q28", "d3q19", "d5q16"]; // id pensiun (Tahap B, Amal 25 Okt 2026), tidak dipakai ulang
+// jumlah pertanyaan per sesi (min-maks lintas peran) menurut Auditor 8.5.3; ubah bersama data
+const PER_DAY_RANGE = [[20, 20], [24, 24], [20, 21], [25, 27], [18, 22], [16, 18], [24, 28]];
 const TOTAL = 174 - RETIRED.length;
 
 const results = { axe: [], external: [], console: [], checks: [], metrics: {}, metricsSession: {} };
@@ -170,6 +173,10 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
     const m = stat[1].b.match(/(\d+)\s*[–-]\s*(\d+)/);
     ok(`rentang pertanyaan per sesi di UI = data (${lo}-${hi}, semua peran)`, !!m && +m[1] === lo && +m[2] === hi, `UI="${stat[1].b}" data=${lo}-${hi}`);
     ok("jumlah sesi di UI = data", +stat[0].b === D.days.length, `UI=${stat[0].b} data=${D.days.length}`);
+    if (RETIRED.length) {
+      const perDay = D.days.map((d) => { const c = ["semua", "suami", "istri"].map((r) => countFor(d, r)); return [Math.min(...c), Math.max(...c)]; });
+      ok("jumlah pertanyaan per sesi = harapan Auditor 8.5.3 (min-maks lintas peran)", JSON.stringify(perDay) === JSON.stringify(PER_DAY_RANGE), JSON.stringify(perDay));
+    }
     ok("label estimasi waktu memakai kata 'perkiraan'", /perkiraan/i.test(stat[2].span), stat[2].span);
 
     // hitungan di UI (kalimat "N pertanyaan.") sama dengan hitungan dari data, 7 hari x 3 peran
@@ -312,6 +319,7 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
         d5q15: { yn: "ya", t: "alasan lama hutang" },
         d5q16: { yn: "ya", t: "jawaban d5q16" },
         d2q27: { yn: "tidak", t: "jawaban d2q27" },
+        d2q8: { t: "jawaban d2q8" },
         d9q99: { t: "id yatim" },
       },
     };
@@ -332,6 +340,13 @@ const ok = (name, pass, detail) => results.checks.push({ name, pass: !!pass, det
     const clip = await page.evaluate(() => navigator.clipboard.readText());
     ok("salin: memuat jawaban d5q15 tanpa awalan 'Ya.' (yn diabaikan)", clip.includes("Jawaban Uji: alasan lama hutang") && !clip.includes("Ya. alasan lama hutang"), clip.slice(0, 200).replace(/\n/g, " | "));
     ok("salin: jawaban id pensiun tidak ikut; id lain tetap", RETIRED.includes("d5q16") ? !clip.includes("jawaban d5q16") : clip.includes("jawaban d5q16"), "");
+    // Hari 2: id pensiun d2q27 tidak tampil dan tidak ikut salin; id selamat d2q8 tetap; data lama tetap di localStorage
+    await page.goto(`${BASE}#hari2`, { waitUntil: "networkidle" }); await page.reload({ waitUntil: "networkidle" });
+    await page.click("#copy-btn"); await page.waitForTimeout(300);
+    const clip2 = await page.evaluate(() => navigator.clipboard.readText());
+    ok("Hari 2: salin memuat jawaban id selamat (d2q8) dan tidak memuat id pensiun (d2q27)", clip2.includes("jawaban d2q8") && (RETIRED.includes("d2q27") ? !clip2.includes("jawaban d2q27") : clip2.includes("jawaban d2q27")), clip2.slice(0, 160).replace(/\n/g, " | "));
+    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem("kenalicalon_v1")).ans);
+    ok("jawaban id pensiun dan id yatim tetap tersimpan di localStorage (tidak dimigrasi/dihapus otomatis)", ["d2q27", "d5q16", "d9q99"].every((i) => stored[i]), JSON.stringify(Object.keys(stored)));
     // yn saja pada pertanyaan yang kini terbuka tidak dihitung; pada pertanyaan ya/tidak tetap dihitung
     await page.evaluate((v) => localStorage.setItem("kenalicalon_v1", JSON.stringify(Object.assign({}, v, { ans: { d5q15: { yn: "ya" }, d2q13: { yn: "tidak" } } }))), legacy);
     await page.reload({ waitUntil: "networkidle" });
