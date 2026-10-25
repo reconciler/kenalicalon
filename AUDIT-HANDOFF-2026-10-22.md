@@ -180,3 +180,53 @@ penghapusan data. Izin Amal untuk perubahan tampilan sudah tercatat (bagian 1). 
    mengubah warna hanya untuk menghilangkannya.
 2. **Pola uji yang terbukti di sini** (opsional): rect teks per baris untuk uji "tombol tidak menimpa teks"; perbandingan
    tinggi sebelum/sesudah lewat baseline (`KC_ONLY=metrics`, `KC_BASELINE`) di `scripts/test_site.js`.
+
+## 10. Eksekusi instruksi Auditor 25 Okt 2026 (`AUDIT-HANDOFF-2026-10-25-auditor.md` bagian 8, commit `e2706f0`)
+
+### 10.1 Dasar dan status
+
+- Instruksi diperiksa di git sebelum dieksekusi: Tahap A (ubah teks, id tetap) tidak menghapus apa pun, jadi dieksekusi dari
+  instruksi. **Tahap B (pensiun 10 id) = penghapusan data**, menunggu konfirmasi Amal di chat PIC (aturan lintas-repo butir 2).
+- **[Keputusan Amal]** 25 Okt 2026 (chat PIC): "Silakan eksekusi sesuai perintah auditor". **[Kesimpulan sendiri]** PIC
+  menafsirkannya sebagai **Tahap A**. Tahap B **tidak dianggap tercakup**: pesan itu tidak menyebut id, dan Auditor (8.6) meminta
+  daftar 8.3 ditampilkan ke Amal dulu. PIC sudah menampilkan daftar itu di chat dan menunggu jawaban.
+
+### 10.2 Tahap A (`11ea855`): teks akhir 7 pertanyaan. **Teks pertanyaan berubah.**
+
+Teks akhir = usulan Auditor 8.2 **apa adanya** (tidak diperhalus); diambil terskrip dari tabel 8.2, dan teks "sekarang" di tabel
+cocok persis dengan `index.html` sebelum perubahan.
+
+| id | Teks akhir | Jenis |
+|---|---|---|
+| d1q1 | Bagaimana kamu menyikapi kelebihan dan kekuranganmu? | terbuka |
+| d2q8 | Selain ortu, siapa tempatmu meminta pendapat (teman, guru, ustadz, murabbi), dan bagaimana pandanganmu tentang mereka? | terbuka |
+| d2q13 | Adakah penyakit keturunan dalam keluarga? | ya/tidak + alasan |
+| d2q15 | Pernahkah kamu bertunangan atau berpacaran, dan seperti apa interaksimu dengan lawan jenis selama ini? Bagaimana pendapatmu tentang pacaran? | terbuka |
+| d2q17 | Bagaimana hubunganmu dengan ortu dan saudara? Apa yang paling berkesan dari ibu dan bapakmu? | terbuka |
+| d3q14 | Berapa waktu ideal dari ta'aruf menuju pernikahan? | terbuka |
+| d5q15 | Bagaimana pandanganmu tentang hutang dalam rumah tangga? | **ya/tidak menjadi terbuka (`k:"o"`)** |
+
+### 10.3 Hasil terhadap syarat 8.5 ([Terverifikasi], lokal, kecuali disebut lain)
+
+| Butir 8.5 | Hasil |
+|---|---|
+| 2 Cek data | JSON valid; id unik; **174** pertanyaan; yang berubah **persis 7 id**; id hilang 0; hanya `k` d5q15 yang berubah; `g` tetap. Teks 20 id dilindungi + 7 "Pertahankan" **identik** dengan `HEAD` sebelum perubahan (sha256 `d57fdac0…`, kini dijaga uji). Kata rujukan: hanya d5q17 (merujuk d5q16, masih ada di Tahap A) dan d7q8 (merujuk d7q7); d2q15 tidak lagi memuat "sebelumnya" |
+| 3 Angka UI | "16-28" dan 7 sesi tidak berubah; uji `claims` lulus (4 cek). Angka "174" tidak muncul di `index.html` maupun `CLAUDE.md` |
+| 4 Jawaban lama | `localStorage` dummy (d1q1, d2q13 hanya `yn`, d5q14, d5q15 `{yn,t}`, d5q16, d2q27, id yatim d9q99): halaman termuat tanpa galat konsol; kartu "done" dan progres cocok; d5q15 menampilkan `t` tanpa tombol Ya/Tidak; "Salin jawaban" memuat d5q15 **tanpa** awalan "Ya."; `yn` saja pada d5q15 **tidak** dihitung terjawab, pada d2q13 tetap dihitung; "Hapus semua jawaban" bersih. 9 cek `legacy` lulus. **Pada versi lama (`HEAD`) 4 dari cek itu gagal**, jadi uji memang menangkap perilakunya |
+| 5 Uji lengkap | **154/154 cek lulus**; axe **0 pelanggaran** di 112 audit (tertutup 72 audit tanpa "perlu cek"; 36 "perlu cek" `bgOverlap` hanya saat panel terbuka, sama seperti sebelumnya); 0 permintaan jaringan luar; 0 error konsol. Tinggi: beranda (hero, atas-footer, dokumen) **sama persis** dengan baseline; topbar 56 px dan pita sesi sama; tinggi halaman Hari 1 **-51 / -77 / -51 px** (320/375/430) karena teks d1q1 lebih pendek. Catatan: "metrik tinggi header 44 px" di instruksi milik repo lain; di sini topbar 56 px dan tidak berubah |
+| Butir 11 | **Teks pertanyaan berubah**; tanpa perubahan CSS atau struktur |
+| Run | Actions #14 (push `11ea855`): `success`; log runner: pengecekan OK (berkas publik, font, 5 berkas internal 404 termasuk ketiga `AUDIT-HANDOFF`, penjaga klaim, 6 aset yang dirujuk) |
+
+### 10.4 Tambahan dan penyimpangan (butir 3 aturan lintas-repo)
+
+- **Kode JS kecil (tidak disebut eksplisit di instruksi):** peta `KIND`; `answered()` dan `buildText()` memakai `yn` hanya untuk
+  pertanyaan berjenis ya/tidak. Alasan: instruksi menyatakan "`yn` diabaikan" untuk d5q15; tanpa kode ini jawaban `yn` lama
+  dihitung terjawab padahal tak tampak, dan "Salin jawaban" memuat "Ya." yang tak lagi relevan. **[Kesimpulan sendiri]**
+  perubahannya sempit dan diuji (3 cek). Mohon Auditor menilai.
+- **Skrip uji:** penjaga data permanen (`PROTECTED_20`, `KEEP_7`, `SHA_27`, teks akhir, `TOTAL`, `RETIRED`) dan uji jawaban lama
+  ditambahkan; cek tinggi halaman sesi menjadi informasional (teks pertanyaan memang boleh mengubah tinggi).
+
+### 10.5 Tahap B: **belum dieksekusi**
+
+Menunggu konfirmasi Amal di chat PIC atas 10 id (d1q2, d1q3, d1q5, d1q21, d2q22, d2q25, d2q27, d2q28, d3q19, d5q16) beserta
+perubahan teks d5q17. Belum ada jawaban Amal atas daftar itu saat bagian ini ditulis.

@@ -46,6 +46,15 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
   alasan), `g` (`""` dijawab berdua, `"s"` khusus calon suami, `"i"` khusus calon istri).
 - **Jangan mengubah atau menghapus `id` yang sudah ada**: jawaban pengguna disimpan per `id`, jadi id yang berubah
   membuat jawaban lama yatim. Pertanyaan baru memakai id baru (mis. `d1q25`); nomor tampil dihitung dari urutan.
+- **Pembagian isi dengan CV** (keputusan Amal 25 Okt 2026, opsi C; instruksi Auditor: `AUDIT-HANDOFF-2026-10-25-auditor.md`
+  bagian 8): 20 pertanyaan adalah satu-satunya tempat topiknya sejak dihapus dari CV: d3q2, d3q3, d3q6, d3q7, d3q9, d3q10,
+  d3q12, d3q15, d3q16, d4q16, d4q23, d4q24, d5q9, d5q19, d5q22, d6q2, d6q3, d6q4, d7q5, d7q23. Ditambah 7 "Pertahankan":
+  d1q22, d2q11, d3q20, d4q7, d5q5, d5q6, d6q1. **Jangan ubah artinya atau hapus tanpa koordinasi Auditor**;
+  `scripts/test_site.js` menjaga teks 27 id itu (`SHA_27`) dan total pertanyaan (`TOTAL`).
+- **Tahap A selesai (25 Okt 2026, `11ea855`):** teks 7 pertanyaan dipotong ke bagian yang tidak ada di CV, id tetap: d1q1,
+  d2q8, d2q13, d2q15, d2q17, d3q14, d5q15. d5q15 berubah dari ya/tidak menjadi terbuka; jawaban lama `{yn,t}` aman (`t`
+  tampil, `yn` diabaikan lewat peta `KIND`: `yn` hanya dihitung untuk pertanyaan berjenis ya/tidak). **Tahap B** (pensiun 10
+  id) = penghapusan data, **menunggu konfirmasi Amal di chat PIC**; sebelum itu aturan "jangan menghapus `id`" berlaku penuh.
 - Mengubah bentuk data penyimpanan: naikkan versi kunci (`kenalicalon_v2`), tulis migrasi atau catat bahwa jawaban lama
   hilang, dan laporkan ke Auditor.
 - Semua teks Bahasa Indonesia, ringkas, bentuk "kamu". Bila jumlah sesi/pertanyaan berubah, perbarui blok "Tentang"
@@ -66,14 +75,16 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
 - Jalankan `scripts/test_site.js` (aturan lintas-repo 13 dan 19): axe di beranda + 8 sesi, 320/430 px, 4 mode (terang,
   gelap, `data-theme` gelap/terang manual); klaim UI vs data; fungsi inti; font lokal; jaringan luar diblokir; metrik
   tinggi. `KC_ONLY=metrics` dan `KC_BASELINE=<hasil.json>` untuk membandingkan tinggi sebelum/sesudah perubahan.
-- Garis dasar setelah push B (22 Okt 2026): axe 0 pelanggaran di 112 audit; panel tertutup (72 audit) 0 "perlu cek"; panel
+- Garis dasar setelah Tahap A (25 Okt 2026): axe 0 pelanggaran di 112 audit; panel tertutup (72 audit) 0 "perlu cek"; panel
   terbuka (40 audit) 36 "perlu cek" `color-contrast` dengan alasan axe `bgOverlap` (teks di bawah panel tertutup panel,
-  sifat overlay, bukan soal warna); 139/139 cek lulus (111 uji Tentang); 0 permintaan jaringan luar; 0 error konsol.
+  sifat overlay, bukan soal warna); 154/154 cek lulus (111 uji Tentang, 6 uji data, 9 uji jawaban lama); 0 permintaan
+  jaringan luar; 0 error konsol. Bagian `data` dan `legacy` bisa dijalankan sendiri: `KC_ONLY=data,legacy`.
 - Perubahan tampilan: sebut bahwa tampilan berubah (aturan 11); cek visual di perangkat nyata oleh Amal.
 
 ## Keputusan terbuka (per 22 Okt 2026; arahan Auditor sudah tercatat di `AUDIT-HANDOFF-2026-10-22-auditor.md`, PIC memperbarui bagian ini saat mengeksekusi)
 
-Semua butir arahan 22 Okt 2026 sudah dieksekusi (push A `1d9f403`, push B `b0d8ce7`). **Sisa yang terbuka: tidak ada.**
+Semua butir arahan 22 Okt 2026 sudah dieksekusi (push A `1d9f403`, push B `b0d8ce7`). **Sisa yang terbuka:** Tahap B instruksi
+25 Okt 2026 (pensiun 10 id, lihat "Mengubah pertanyaan") menunggu konfirmasi Amal di chat PIC.
 Belum terbukti: tampilan di perangkat nyata (aturan 11) dan uji pembaca layar/urutan Tab (hanya Esc, fokus, dan axe yang diuji).
 
 1. **Kontras kicker** (`.band .kicker`): **selesai, push A (`1d9f403`, 22 Okt 2026)**. Amber `#E0A458` (2,77:1 sampai 4,79:1
