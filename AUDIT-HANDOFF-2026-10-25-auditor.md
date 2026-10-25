@@ -137,4 +137,99 @@ Pemetaan berdasarkan teks pertanyaan, bersifat penilaian Auditor (bukan pencocok
 | d7q5 | Berapa jumlah anak yang diinginkan, dan berapa jarak usia idealnya? | L.08 |
 | d7q23 | Bagaimana pandanganmu tentang pendidikan formal anak (sekolah umum, s… | L.08 |
 
-- Pertanyaan Kenali Calon yang masih mengulang CV turun dari 44 jadi 24 (umumnya fakta dan kebiasaan). Sisanya baru dibahas bila Amal memilih opsi A atau B di bagian 3; **belum ada keputusan**.
+- Pertanyaan Kenali Calon yang masih mengulang CV turun dari 44 jadi 24 (umumnya fakta dan kebiasaan). Sisanya ditangani di **bagian 8** (Amal 25 Okt 2026: "Ok tolong siapkan perintah eksekusi" atas klasifikasi Hapus 10 / Sederhanakan 7 / Pertahankan 7; Tahap B menunggu konfirmasi Amal di chat PIC).
+
+## 8. Instruksi eksekusi: 24 pertanyaan yang masih mengulang CV (Amal 25 Okt 2026)
+
+### 8.1 Dasar dan status
+
+- **[Keputusan Amal]** 25 Okt 2026 (chat Auditor), setelah Auditor menyajikan klasifikasi: "Ok tolong siapkan perintah eksekusi". Auditor menafsirkan ini sebagai **persetujuan atas klasifikasi apa adanya** (Hapus 10, Sederhanakan 7, Pertahankan 7). Bila Amal ternyata hanya menghendaki sebagian, Amal menyebutnya di chat PIC; Tahap A dan B di bawah sengaja dipisah supaya bisa jalan sendiri-sendiri.
+- **[Penilaian Auditor]** Klasifikasi dan teks baru adalah kesimpulan Auditor dari pemetaan bagian 4 plus pembacaan teks lengkap; **bukan** sumber eksternal. Teks baru adalah usulan: PIC boleh memperhalus kata asal maknanya sama, lalu mencatat teks akhir.
+- **Pembagian menurut aturan lintas-repo butir 2:** Tahap A (ubah teks, id tetap) tidak menghapus apa pun, jadi boleh langsung dieksekusi dari instruksi ini. **Tahap B (pensiunkan 10 id) = penghapusan data (jawaban lama pada id itu tidak tampil lagi) dan menunggu konfirmasi Amal di chat PIC ini** (teks usulan di 8.6). Kutipan Amal di chat Auditor tidak cukup.
+- **Penyimpangan dari `CLAUDE.md` repo ini, sadar:** aturan "jangan menghapus `id`" dikecualikan untuk 10 id di Tahap B atas keputusan Amal. Alasan aturan itu (jawaban yatim) memang dipilih Amal di sini; id tidak dipakai ulang. PIC mencatat pengecualian dan daftar id pensiun di `CLAUDE.md`.
+
+### 8.2 Tahap A: ubah teks 7 pertanyaan (id dan makna dasar tetap)
+
+Hanya potong bagian yang sudah ada di CV. Tidak ada pertanyaan yang hilang, jumlah tetap 174. Kolom CV pemegang topik tetap ada setelah opsi C [Terverifikasi dari inventaris dan 8.1 bikin].
+
+| id | Teks sekarang | Teks baru (usulan) | Jenis | CV pemegang bagian yang dipotong |
+|---|---|---|---|---|
+| d1q1 | Deskripsikan dirimu: karakter, kelebihan, dan kekurangan (misalnya 10 hal positif dan negatif). Bagaimana kamu menyikapinya? | Bagaimana kamu menyikapi kelebihan dan kekuranganmu? | terbuka | G.01 deskripsi diri, G.03 kelebihan, G.04 kekurangan (semua wajib) |
+| d2q8 | Kajian, guru, atau manhaj apa yang kamu ikuti? Selain ortu, siapa tempatmu meminta pendapat (teman, guru, ustadz, murabbi), dan bagaimana pandanganmu tentang mereka? | Selain ortu, siapa tempatmu meminta pendapat (teman, guru, ustadz, murabbi), dan bagaimana pandanganmu tentang mereka? | terbuka | B.06 manhaj, I.08 pengajian rutin |
+| d2q13 | Adakah riwayat penyakit pribadi atau penyakit keturunan dalam keluarga? | Adakah penyakit keturunan dalam keluarga? | ya/tidak + alasan | D.08 (hanya penyakit pribadi; penyakit keturunan TIDAK ada di CV) |
+| d2q15 | Bagaimana riwayat hubunganmu: status sebelumnya (lajang, pernah bertunangan, pernah menikah, punya anak), pernah berpacaran atau tidak, dan interaksimu dengan lawan jenis selama ini? Bagaimana pendapatmu tentang pacaran? | Pernahkah kamu bertunangan atau berpacaran, dan seperti apa interaksimu dengan lawan jenis selama ini? Bagaimana pendapatmu tentang pacaran? | terbuka | B.08 status pernikahan (Perjaka/Gadis/Duda/Janda), H.11 status anak. Pertunangan TIDAK ada di CV |
+| d2q17 | Jelaskan latar belakang keluargamu (ortu masih lengkap atau tidak, hubungan dengan ortu dan saudara). Seperti apa sosok ibu dan bapakmu, dan apa yang paling berkesan dari mereka? | Bagaimana hubunganmu dengan ortu dan saudara? Apa yang paling berkesan dari ibu dan bapakmu? | terbuka | H.02 gambaran ortu, H.05 status ortu, H.13 saudara |
+| d3q14 | Kapan target waktumu menikah? Berapa waktu ideal dari ta'aruf menuju pernikahan? | Berapa waktu ideal dari ta'aruf menuju pernikahan? | terbuka | J.07 rencana waktu menikah (wajib) |
+| d5q15 | Apakah kamu punya hutang atau cicilan pribadi saat ini? Bagaimana pandanganmu tentang hutang dalam rumah tangga? | Bagaimana pandanganmu tentang hutang dalam rumah tangga? | ya/tidak + alasan **menjadi terbuka (`k:"o"`)** | J.06 tanggungan utang/cicilan |
+
+- **d5q15: `k` berubah dari `"y"` ke `"o"`.** Teks baru bukan pertanyaan ya/tidak. Jawaban lama tetap tersimpan sebagai `{yn, t}`; `t` tetap tampil, `yn` diabaikan. PIC memastikan tidak ada galat membaca jawaban lama (uji: muat `localStorage` dengan jawaban d5q15 bentuk lama).
+- **Efek ke jawaban lama (diterima):** tiap id punya jawaban yang ditulis untuk teks panjang. Teks baru adalah himpunan bagian, jadi jawaban lama tetap relevan walau bisa memuat bagian yang kini ditanyakan di CV. Aplikasi baru tayang 22 Okt; jumlah pengguna tidak terukur (tanpa analitik).
+
+### 8.3 Tahap B: pensiunkan 10 id (menunggu konfirmasi Amal di chat PIC)
+
+| id | Teks (hapus) | CV pemegang topik (tetap ada) | Keyakinan Auditor |
+|---|---|---|---|
+| d1q2 | Sifat apa yang kamu sukai dari diri sendiri? | G.05 (disukai/tidak disukai), G.03 (kelebihan) | sedang |
+| d1q3 | Apa hal yang paling kamu sukai dan paling tidak kamu sukai? | G.05 (disukai/tidak disukai) | sedang |
+| d1q5 | Siapa tokoh yang menginspirasimu? Kenapa? | G.08 (tokoh idola) | tinggi |
+| d1q21 | Amalan atau praktik ibadah harian apa yang rutin kamu jalankan (shalat, tilawah, puasa sunnah, dll.)? | I.01 shalat wajib, I.02 sunnah, I.04 puasa sunnah, I.06 tilawah | tinggi |
+| d2q22 | Apa hobi dan aktivitas me time yang membuat energimu terisi kembali? | F.09 hobi, G.09 kegiatan waktu luang | sedang |
+| d2q25 | Buku apa (umum maupun agama) yang paling menginspirasi dan kamu rekomendasikan? | G.06 bacaan favorit | tinggi |
+| d2q27 | Apakah kamu merokok? Kenapa memutuskan begitu? | D.12 merokok/alkohol/narkoba | tinggi |
+| d2q28 | Pernahkah kamu mengonsumsi alkohol? | D.12 merokok/alkohol/narkoba (opsi 'Konsumsi lain') | tinggi |
+| d3q19 | Apakah ortu sudah merestui rencana menikah dalam waktu dekat? | B.09 izin/restu ortu, J.05 kesiapan ortu | tinggi |
+| d5q16 | Apakah ada kewajiban membiayai ortu atau saudara (cicilan, biaya sekolah) setelah menikah? | J.09 tanggungan nafkah keluarga | tinggi |
+
+**Perubahan lain yang wajib sama-sama dalam push Tahap B:**
+
+- **d5q17** ("Bersediakah jika pasangan punya kewajiban tersebut?") menunjuk "kewajiban tersebut" ke d5q16 yang dihapus. Ganti teks menjadi: **"Bersediakah jika pasangan punya kewajiban membiayai ortu atau saudaranya (cicilan, biaya sekolah)?"** (id dan jenis ya/tidak tetap). [Terverifikasi dari data: satu-satunya rujukan menggantung; dicek dengan menyisir kata "tersebut/itu/tadi/di atas/sebelumnya" pada semua pertanyaan.]
+- Hapus 10 objek itu dari `cats[].qs[]` di `window.PANDUAN_DATA`. Tidak ada kategori yang menjadi kosong (terkecil: "Gaya Hidup & Sosial" 7 menjadi 3) [Terverifikasi dari data].
+- `CLAUDE.md` bagian "Mengubah pertanyaan": tambah daftar **id pensiun** (10 id di atas, tanggal, dasar keputusan Amal), tegaskan id pensiun **tidak dipakai ulang**, dan ubah kalimat "Jangan mengubah atau menghapus `id`" menjadi mengacu daftar itu.
+- **Jawaban lama pada 10 id dibiarkan di `localStorage`** (tidak dimigrasi, kunci tetap `kenalicalon_v1`, tidak ada pembersihan otomatis). Jawaban itu tidak tampil dan tidak ikut "Salin jawaban". "Hapus semua jawaban" tetap membersihkannya. Membersihkannya otomatis = penghapusan data tambahan dan hanya atas keputusan Amal.
+
+### 8.4 Yang tidak boleh disentuh
+
+- **20 pertanyaan di bagian 7** (satu-satunya tempat topik yang dihapus dari CV): d3q2, d3q3, d3q6, d3q7, d3q9, d3q10, d3q12, d3q15, d3q16, d4q16, d4q23, d4q24, d5q9, d5q19, d5q22, d6q2, d6q3, d6q4, d7q5, d7q23. [Terverifikasi: tidak beririsan dengan Tahap A maupun B.]
+- **7 pertanyaan "Pertahankan"** (tidak diubah; alasan di bawah) dan 130 pertanyaan lain (174 - 10 - 7 - 7 - 20). Tidak ada pertanyaan baru, tidak ada id berubah selain pensiun 10 id.
+
+| id | Alasan dipertahankan (Penilaian Auditor) |
+|---|---|
+| d1q22 | CV I.06 hanya mencatat tilawah/hafalan; ini menanyakan kelekatan dan pandangan |
+| d2q11 | CV hanya D.13 (halal) dan D.14 (tidur); ini mencakup olahraga dan pola makan sehat |
+| d3q20 | Kecocokan dengan M.06 lemah, dan M.06 dihapus dari CV oleh opsi C; ini jadi satu-satunya tempat topiknya |
+| d4q7 | Waktu luang SETELAH menikah; CV G.09 menanyakan waktu luang sekarang |
+| d5q5 | Ekspektasi penghasilan suami; CV F.08 mencatat penghasilan sendiri |
+| d5q6 | Kemampuan nafkah bulanan; CV F.08 mencatat penghasilan, bukan nafkah |
+| d6q1 | Rutinitas harian (bangun, tidur, kebersihan); CV D.14 hanya pola tidur |
+
+### 8.5 Syarat uji dan terbit
+
+1. **Dua push terpisah**, risiko rendah dulu (butir 6): push 1 = Tahap A; push 2 = Tahap B (hanya setelah Amal menjawab di chat PIC). Verifikasi run `success` tiap push.
+2. **Cek data otomatis (skrip lokal, catat hasilnya):** JSON valid; id unik; setelah Tahap B total **164** pertanyaan; id yang hilang **persis** 10 id di 8.3; teks 20 id bagian 7 dan 7 id "Pertahankan" sama persis dengan sebelum perubahan (bandingkan dengan `git show HEAD:index.html`); tidak ada kata rujukan menggantung ("tersebut/itu/tadi/di atas/sebelumnya") yang rujukannya sudah hilang.
+3. **Angka UI:** rentang "16–28 pertanyaan per sesi" **tidak berubah** (dihitung Auditor dari data setelah Tahap B: tetap 16–28 di semua peran; per sesi menjadi H1 20, H2 24, H3 20–21, H4 25–27, H5 18–22, H6 16–18, H7 24–28) [Terverifikasi dari data]. Jumlah sesi tetap 7. `scripts/test_site.js` bagian `claims` harus lulus. Tidak ada angka "174" di `index.html` (dicek Auditor) tetapi PIC memeriksa ulang README/`CLAUDE.md` bila menyebut total.
+4. **Jawaban lama:** uji dengan `localStorage` berisi jawaban untuk id pensiun (mis. d2q27) dan id yang diubah (d1q1, d5q15): halaman termuat tanpa galat, progres dan hitungan benar, "Salin jawaban" tidak memuat id pensiun dan tetap memuat jawaban d1q1/d5q15, "Hapus semua jawaban" bekerja. Pakai data dummy.
+5. **Uji lengkap** (butir 13 dan 19): `node scripts/test_site.js` (axe 0 pelanggaran, 320/430, terang/gelap), metrik tinggi header 44 px, jaringan luar terblokir. Sebut "teks pertanyaan berubah" (butir 11); tanpa perubahan CSS atau struktur.
+6. **Laporan:** catat di `AUDIT-HANDOFF-2026-10-22.md` (atau berkas PIC baru) teks akhir 7 pertanyaan, daftar id pensiun, hasil uji, dan SHA run. Ini termasuk "wajib lapor" (penghapusan id): konfirmasi lewat chat ke Amal **dan** commit.
+
+### 8.6 Konfirmasi di chat PIC (untuk Amal; menyalakan Tahap B)
+
+PIC menampilkan 8.3 ke Amal dalam satu pesan. Teks usulan yang Amal tempel di chat PIC:
+
+> Konfirmasi Amal 25 Okt 2026: saya setuju pensiunkan 10 id ini dari Kenali Calon: d1q2, d1q3, d1q5, d1q21, d2q22, d2q25, d2q27, d2q28, d3q19, d5q16. Saya paham jawaban lama pada 10 id itu tidak tampil lagi, tetapi tetap tersimpan di perangkat pengguna. Jalankan Tahap B di bagian 8 handoff Auditor 25 Okt.
+
+Bila Amal ingin lebih sempit (mis. tanpa d1q2/d1q3/d2q22 yang keyakinannya "sedang"), ikuti jawabannya dan catat.
+
+### 8.7 Verifikasi Auditor setelah selesai
+
+- Auditor membandingkan `index.html` sebelum dan sesudah: id yang hilang persis 10; 7 teks sesuai 8.2 (atau perbaikan yang dicatat PIC); 27 teks yang tidak boleh berubah sama persis; total 164; run `success`; `CLAUDE.md` memuat daftar id pensiun. Hasil dicatat di bagian verifikasi handoff ini.
+- Auditor menambah catatan simetris di repo `bikin-cv-taaruf`: 25 kolom CV pemegang topik (daftar di bawah) tidak boleh dihapus tanpa koordinasi, karena sekarang satu-satunya tempat topiknya.
+
+### 8.8 Koreksi atas pemetaan bagian 4 (kesalahan Auditor)
+
+- **d2q13 / D.08:** pemetaan menulis catatan "riwayat penyakit pribadi dan keturunan" sebagai padanan penuh. Setelah label dan placeholder `SCHEMA` dibaca ulang, D.08 hanya "Riwayat penyakit yang pernah / sedang diderita" (pribadi). **Penyakit keturunan tidak ada di CV.** Itu sebabnya d2q13 diklasifikasi Sederhanakan (bagian keturunan dipertahankan), bukan Hapus.
+- **d2q15 / B.08:** pilihan B.08 hanya Perjaka/Gadis/Duda/Janda. **Pertunangan tidak ada di CV**, jadi teks baru d2q15 mempertahankannya.
+- Kedua koreksi diverifikasi dari `SCHEMA` di `bikin-cv-taaruf/index.html` (Auditor, 25 Okt 2026). Jumlah "24 yang masih mengulang" tidak berubah; hanya isi potongannya.
+
+**Batas:** analisis hanya membandingkan **antar-produk**. Tumpang tindih di dalam Kenali Calon (mis. d1q2 dan d1q3 saling mirip) tidak dianalisis.
+
+**25 kolom CV pemegang topik** (untuk catatan simetris): B.06, B.08, B.09, D.08, D.12, F.09, G.01, G.03, G.04, G.05, G.06, G.08, G.09, H.02, H.05, H.11, I.01, I.02, I.04, I.06, I.08, J.05, J.06, J.07, J.09.
