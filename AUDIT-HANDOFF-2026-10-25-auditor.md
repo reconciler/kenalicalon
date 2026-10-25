@@ -233,3 +233,13 @@ Bila Amal ingin lebih sempit (mis. tanpa d1q2/d1q3/d2q22 yang keyakinannya "seda
 **Batas:** analisis hanya membandingkan **antar-produk**. Tumpang tindih di dalam Kenali Calon (mis. d1q2 dan d1q3 saling mirip) tidak dianalisis.
 
 **25 kolom CV pemegang topik** (untuk catatan simetris): B.06, B.08, B.09, D.08, D.12, F.09, G.01, G.03, G.04, G.05, G.06, G.08, G.09, H.02, H.05, H.11, I.01, I.02, I.04, I.06, I.08, J.05, J.06, J.07, J.09.
+
+## 9. Verifikasi Auditor atas Tahap A (25 Okt 2026, setelah laporan PIC `AUDIT-HANDOFF-2026-10-22.md` bagian 10)
+
+Penanda: **[Diperiksa Auditor]** dijalankan Auditor sendiri dari git; **[Laporan PIC]** diambil dari laporan PIC, tidak dijalankan ulang.
+
+- **[Diperiksa Auditor]** `PANDUAN_DATA` di `e2706f0` dibanding `HEAD` (`57f5a1a`): total 174 di kedua sisi; himpunan id sama; yang berubah **persis 7 id** (d1q1, d2q8, d2q13, d2q15, d2q17, d3q14, d5q15); teks ketujuhnya **sama persis** dengan tabel 8.2; `g` tidak berubah; `k` hanya d5q15 (`y` menjadi `o`); 20 id bagian 7 dan 7 id "Pertahankan" identik objek per objek; judul sesi dan nama kategori tidak berubah.
+- **[Diperiksa Auditor]** Diff kode `index.html` di luar data: tiga baris (peta `KIND`, `answered()`, `buildText()`). **Penyimpangan 10.4 diterima.** Alasan: instruksi 8.2 sendiri menyatakan `yn` d5q15 diabaikan; tanpa kode ini jawaban `yn` lama dihitung terjawab dan terkirim sebagai "Ya." padahal tidak tampak. Perubahannya sempit dan tidak menyentuh id yatim (tidak ada di `KIND`, tidak pernah dilewati). Dicatat sebagai penyimpangan sah (butir 3), tidak perlu dibalik.
+- **[Diperiksa Auditor, via API Actions]** Run #14 (`11ea855`) dan #15 (`57f5a1a`) `success`.
+- **[Laporan PIC, tidak dijalankan ulang]** 154/154 cek, axe 0 pelanggaran di 112 audit, 0 permintaan jaringan luar, uji jawaban lama. Tampilan berubah (teks pertanyaan); belum dilihat di perangkat nyata.
+- **Penafsiran konfirmasi Amal oleh PIC dinilai tepat.** "Silakan eksekusi sesuai perintah auditor" tanpa menyebut id tidak dibaca sebagai Tahap B; daftar 8.3 ditampilkan dulu. Tahap B tetap **belum dikerjakan** dan menunggu jawaban Amal di chat PIC. Saat Tahap B dikerjakan: ikuti 8.3 (termasuk teks d5q17) dan 8.5.
