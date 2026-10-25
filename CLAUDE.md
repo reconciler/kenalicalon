@@ -44,8 +44,9 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
   `reflection[]` (sesi penutup).
 - Tiap pertanyaan: `id` (unik: `d{hari}q{nomor}`, `p{n}` untuk penutup), `t` (teks), `k` (`"o"` terbuka, `"y"` ya/tidak +
   alasan), `g` (`""` dijawab berdua, `"s"` khusus calon suami, `"i"` khusus calon istri).
-- **Jangan mengubah atau menghapus `id` yang sudah ada**: jawaban pengguna disimpan per `id`, jadi id yang berubah
-  membuat jawaban lama yatim. Pertanyaan baru memakai id baru (mis. `d1q25`); nomor tampil dihitung dari urutan.
+- **Jangan mengubah atau menghapus `id` yang sudah ada**, kecuali 10 **id pensiun** di bawah (keputusan Amal 25 Okt 2026):
+  jawaban pengguna disimpan per `id`, jadi id yang berubah membuat jawaban lama yatim. Pertanyaan baru memakai id baru
+  (mis. `d1q25`); nomor tampil dihitung dari urutan. **Id pensiun tidak dipakai ulang** (uji `RETIRED` menjaganya).
 - **Pembagian isi dengan CV** (keputusan Amal 25 Okt 2026, opsi C; instruksi Auditor: `AUDIT-HANDOFF-2026-10-25-auditor.md`
   bagian 8): 20 pertanyaan adalah satu-satunya tempat topiknya sejak dihapus dari CV: d3q2, d3q3, d3q6, d3q7, d3q9, d3q10,
   d3q12, d3q15, d3q16, d4q16, d4q23, d4q24, d5q9, d5q19, d5q22, d6q2, d6q3, d6q4, d7q5, d7q23. Ditambah 7 "Pertahankan":
@@ -53,8 +54,13 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
   `scripts/test_site.js` menjaga teks 27 id itu (`SHA_27`) dan total pertanyaan (`TOTAL`).
 - **Tahap A selesai (25 Okt 2026, `11ea855`):** teks 7 pertanyaan dipotong ke bagian yang tidak ada di CV, id tetap: d1q1,
   d2q8, d2q13, d2q15, d2q17, d3q14, d5q15. d5q15 berubah dari ya/tidak menjadi terbuka; jawaban lama `{yn,t}` aman (`t`
-  tampil, `yn` diabaikan lewat peta `KIND`: `yn` hanya dihitung untuk pertanyaan berjenis ya/tidak). **Tahap B** (pensiun 10
-  id) = penghapusan data, **menunggu konfirmasi Amal di chat PIC**; sebelum itu aturan "jangan menghapus `id`" berlaku penuh.
+  tampil, `yn` diabaikan lewat peta `KIND`: `yn` hanya dihitung untuk pertanyaan berjenis ya/tidak).
+- **Tahap B selesai (25 Okt 2026, `e1e529f`): 10 id pensiun**, atas konfirmasi Amal di chat PIC ("Setuju semua 10", 25 Okt 2026;
+  dasar: instruksi Auditor 8.3): **d1q2, d1q3, d1q5, d1q21, d2q22, d2q25, d2q27, d2q28, d3q19, d5q16**. Topiknya tetap ada di CV.
+  Total pertanyaan 164. Teks d5q17 diubah (id dan jenis tetap) karena "kewajiban tersebut" merujuk d5q16. Jawaban lama pada
+  id pensiun **dibiarkan di `localStorage`** (tidak dimigrasi, tidak dibersihkan otomatis; tidak tampil dan tidak ikut "Salin
+  jawaban"; "Hapus semua jawaban" membersihkannya). Membersihkannya otomatis = penghapusan data tambahan, hanya atas
+  keputusan Amal.
 - Mengubah bentuk data penyimpanan: naikkan versi kunci (`kenalicalon_v2`), tulis migrasi atau catat bahwa jawaban lama
   hilang, dan laporkan ke Auditor.
 - Semua teks Bahasa Indonesia, ringkas, bentuk "kamu". Bila jumlah sesi/pertanyaan berubah, perbarui blok "Tentang"
@@ -75,16 +81,16 @@ Workflow menyalin hanya `index.html`, `og-image.png`, `favicon.svg`, `robots.txt
 - Jalankan `scripts/test_site.js` (aturan lintas-repo 13 dan 19): axe di beranda + 8 sesi, 320/430 px, 4 mode (terang,
   gelap, `data-theme` gelap/terang manual); klaim UI vs data; fungsi inti; font lokal; jaringan luar diblokir; metrik
   tinggi. `KC_ONLY=metrics` dan `KC_BASELINE=<hasil.json>` untuk membandingkan tinggi sebelum/sesudah perubahan.
-- Garis dasar setelah Tahap A (25 Okt 2026): axe 0 pelanggaran di 112 audit; panel tertutup (72 audit) 0 "perlu cek"; panel
-  terbuka (40 audit) 36 "perlu cek" `color-contrast` dengan alasan axe `bgOverlap` (teks di bawah panel tertutup panel,
-  sifat overlay, bukan soal warna); 154/154 cek lulus (111 uji Tentang, 6 uji data, 9 uji jawaban lama); 0 permintaan
-  jaringan luar; 0 error konsol. Bagian `data` dan `legacy` bisa dijalankan sendiri: `KC_ONLY=data,legacy`.
+- Garis dasar setelah Tahap B (25 Okt 2026, 164 pertanyaan): axe 0 pelanggaran di 112 audit; panel tertutup (72 audit) 0
+  "perlu cek"; panel terbuka (40 audit) 36 "perlu cek" `color-contrast` dengan alasan axe `bgOverlap` (teks di bawah panel
+  tertutup panel, sifat overlay, bukan soal warna); 157/157 cek lulus; 0 permintaan jaringan luar; 0 error konsol. Bagian
+  `data`, `legacy`, `claims`, `about`, `core`, `axe`, `metrics` bisa dijalankan sendiri: `KC_ONLY=data,legacy`.
 - Perubahan tampilan: sebut bahwa tampilan berubah (aturan 11); cek visual di perangkat nyata oleh Amal.
 
 ## Keputusan terbuka (per 22 Okt 2026; arahan Auditor sudah tercatat di `AUDIT-HANDOFF-2026-10-22-auditor.md`, PIC memperbarui bagian ini saat mengeksekusi)
 
-Semua butir arahan 22 Okt 2026 sudah dieksekusi (push A `1d9f403`, push B `b0d8ce7`). **Sisa yang terbuka:** Tahap B instruksi
-25 Okt 2026 (pensiun 10 id, lihat "Mengubah pertanyaan") menunggu konfirmasi Amal di chat PIC.
+Semua butir arahan 22 Okt 2026 sudah dieksekusi (push A `1d9f403`, push B `b0d8ce7`). Instruksi 25 Okt 2026 (Tahap A `11ea855`,
+Tahap B `e1e529f`) juga selesai. **Sisa yang terbuka: tidak ada.**
 Belum terbukti: tampilan di perangkat nyata (aturan 11) dan uji pembaca layar/urutan Tab (hanya Esc, fokus, dan axe yang diuji).
 
 1. **Kontras kicker** (`.band .kicker`): **selesai, push A (`1d9f403`, 22 Okt 2026)**. Amber `#E0A458` (2,77:1 sampai 4,79:1

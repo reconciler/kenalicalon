@@ -226,7 +226,31 @@ cocok persis dengan `index.html` sebelum perubahan.
 - **Skrip uji:** penjaga data permanen (`PROTECTED_20`, `KEEP_7`, `SHA_27`, teks akhir, `TOTAL`, `RETIRED`) dan uji jawaban lama
   ditambahkan; cek tinggi halaman sesi menjadi informasional (teks pertanyaan memang boleh mengubah tinggi).
 
-### 10.5 Tahap B: **belum dieksekusi**
+### 10.5 Tahap B (`e1e529f`): 10 id pensiun. **Penghapusan data; teks pertanyaan berubah.**
 
-Menunggu konfirmasi Amal di chat PIC atas 10 id (d1q2, d1q3, d1q5, d1q21, d2q22, d2q25, d2q27, d2q28, d3q19, d5q16) beserta
-perubahan teks d5q17. Belum ada jawaban Amal atas daftar itu saat bagian ini ditulis.
+- **Konfirmasi:** **[Keputusan Amal]** 25 Okt 2026 (chat PIC): **"Setuju semua 10"**, sesudah PIC menampilkan 8.3 (id, teks, dampak,
+  keyakinan Auditor). Daftar yang dieksekusi dicocokkan terskrip dengan daftar yang disetujui Amal dan dengan tabel 8.3; teks tiap
+  pertanyaan yang dihapus dicocokkan persis dengan `index.html` sebelum dihapus.
+- **Id pensiun (tidak dipakai ulang):** d1q2, d1q3, d1q5, d1q21, d2q22, d2q25, d2q27, d2q28, d3q19, d5q16. Total **164**.
+  Tidak ada kategori kosong: "Gaya Hidup & Sosial" 7 menjadi 3; "Diri Sendiri" 11 menjadi 8; "Agama & Values: Keyakinan dan Ibadah"
+  13 menjadi 12; "Kesiapan & Rencana Pernikahan" 11 menjadi 10; "Keuangan" 18 menjadi 17.
+- **d5q17** (id dan jenis ya/tidak tetap): "Bersediakah jika pasangan punya kewajiban membiayai ortu atau saudaranya (cicilan, biaya
+  sekolah)?" (teks usulan 8.3 apa adanya).
+- **Jawaban lama pada 10 id:** dibiarkan di `localStorage` (tidak dimigrasi, tidak ada pembersihan otomatis); tidak tampil, tidak ikut
+  "Salin jawaban"; "Hapus semua jawaban" membersihkannya. Semuanya diuji (data dummy).
+- **Kelalaian saya di Tahap A:** `sitemap.xml` `lastmod` tidak diperbarui saat teks berubah (tetap 2026-10-22). Dikoreksi di Tahap B
+  (2026-10-25).
+
+| Butir 8.5 | Hasil ([Terverifikasi], lokal, kecuali disebut lain) |
+|---|---|
+| 2 Cek data | JSON valid; id unik; **164**; id hilang **persis 10**; yang berubah selain itu **hanya d5q17**; judul sesi, fase, dan penutup tidak berubah; teks 20 dilindungi + 7 "Pertahankan" identik (sha256 `d57fdac0…`). Kata rujukan: tersisa hanya d7q8 (merujuk d7q7); d5q17 baru tidak lagi memakai "tersebut" |
+| 3 Angka UI | "16-28" dan 7 sesi tidak berubah. Jumlah per sesi (min-maks lintas peran) = hitungan Auditor: H1 20, H2 24, H3 20-21, H4 25-27, H5 18-22, H6 16-18, H7 24-28 (kini diuji) |
+| 4 Jawaban lama | Jawaban d5q16 (Hari 5) dan d2q27 (Hari 2) pada `localStorage`: halaman termuat tanpa galat; kartu "done" dan progres tidak menghitungnya; "Salin jawaban" tidak memuatnya dan tetap memuat id selamat (d2q8, d5q14, d5q15); data lama tetap di `localStorage` (juga id yatim); "Hapus semua jawaban" membersihkan semuanya. Pada versi sebelum Tahap B, 8 cek ini gagal di titik yang diharapkan |
+| 5 Uji lengkap | **157/157 cek lulus**; axe **0 pelanggaran** di 112 audit (tertutup 72 audit tanpa "perlu cek"; 36 "perlu cek" `bgOverlap` hanya saat panel terbuka, tidak berubah); 0 permintaan jaringan luar; 0 error konsol. Tinggi: beranda (hero, atas-footer, dokumen) **sama persis**; topbar 56 px dan pita sesi sama; halaman Hari 1 **-575 / -549 / -523 px** (320/375/430) karena 4 pertanyaan dipensiunkan |
+| Butir 11 | **Teks pertanyaan berubah**; tanpa perubahan CSS atau struktur |
+| Run | Actions #17 (push `e1e529f`): `success`; log runner dibaca: seluruh pengecekan OK (berkas publik, font, 5 berkas internal 404, penjaga klaim, 6 aset yang dirujuk) |
+
+- **Belum terbukti:** tampilan di perangkat nyata; efek pada pengguna yang sudah mengisi (jumlah tidak terukur, tanpa analitik).
+- **Untuk verifikasi Auditor (8.7):** id hilang persis 10; 7 teks Tahap A; teks d5q17; 27 teks terlindungi sama; total 164; run `success`;
+  `CLAUDE.md` bagian "Mengubah pertanyaan" memuat daftar id pensiun dan aturan "tidak dipakai ulang".
+- **Untuk repo lain:** tidak ada temuan baru. Catatan simetris Auditor (25 kolom CV pemegang topik) menjadi urusan repo `bikin-cv-taaruf`.
