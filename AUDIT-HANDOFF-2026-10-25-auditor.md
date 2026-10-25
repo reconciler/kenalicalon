@@ -243,3 +243,17 @@ Penanda: **[Diperiksa Auditor]** dijalankan Auditor sendiri dari git; **[Laporan
 - **[Diperiksa Auditor, via API Actions]** Run #14 (`11ea855`) dan #15 (`57f5a1a`) `success`.
 - **[Laporan PIC, tidak dijalankan ulang]** 154/154 cek, axe 0 pelanggaran di 112 audit, 0 permintaan jaringan luar, uji jawaban lama. Tampilan berubah (teks pertanyaan); belum dilihat di perangkat nyata.
 - **Penafsiran konfirmasi Amal oleh PIC dinilai tepat.** "Silakan eksekusi sesuai perintah auditor" tanpa menyebut id tidak dibaca sebagai Tahap B; daftar 8.3 ditampilkan dulu. Tahap B tetap **belum dikerjakan** dan menunggu jawaban Amal di chat PIC. Saat Tahap B dikerjakan: ikuti 8.3 (termasuk teks d5q17) dan 8.5.
+
+## 10. Verifikasi Auditor atas Tahap B (25 Okt 2026, setelah laporan PIC `AUDIT-HANDOFF-2026-10-22.md` bagian 10.5)
+
+Penanda: **[Diperiksa Auditor]** dijalankan Auditor sendiri dari git/API; **[Laporan PIC]** diambil dari laporan PIC, tidak dijalankan ulang.
+
+- **[Diperiksa Auditor]** `PANDUAN_DATA` di `57f5a1a` (setelah Tahap A) dibanding `HEAD` (`96a9282`): 174 menjadi **164**; id yang hilang **persis** d1q2, d1q3, d1q5, d1q21, d2q22, d2q25, d2q27, d2q28, d3q19, d5q16; tidak ada id baru; id unik; **satu-satunya perubahan lain d5q17**, teksnya sama persis dengan 8.3 dan `k` tetap `y`; 20 id bagian 7, 7 id "Pertahankan", dan 7 teks Tahap A identik; judul sesi dan nama kategori tidak berubah; tidak ada kategori kosong.
+- **[Diperiksa Auditor]** Jumlah per sesi (semua/suami/istri): H1 20/20/20, H2 24/24/24, H3 21/20/20, H4 27/25/25, H5 22/18/18, H6 18/16/16, H7 28/24/24; rentang **16–28**, sama dengan teks UI "16–28" (tidak perlu diubah) dan sama dengan hitungan 8.5 butir 3.
+- **[Diperiksa Auditor]** Kata rujukan menggantung: tidak ada. Sisa kata "kedua/keduanya/tersebut" (d4q15, d6q8, d7q8, d7q17) merujuk ke pertanyaan atau pihak yang masih ada.
+- **[Diperiksa Auditor]** Diff `index.html` Tahap B hanya baris data; tidak ada perubahan kode JS atau CSS. `sitemap.xml` `lastmod` 2026-10-25 (perbaikan kelalaian Tahap A). `CLAUDE.md` memuat daftar 10 id pensiun, aturan "tidak dipakai ulang", dan kutipan konfirmasi Amal.
+- **[Diperiksa Auditor, via API Actions]** Run #17 (`e1e529f`, Tahap B) dan #18 (`96a9282`, dokumen) `success`.
+- **[Laporan PIC, tidak dijalankan ulang]** 157/157 cek, axe 0 pelanggaran di 112 audit, 0 permintaan jaringan luar, uji jawaban lama untuk id pensiun (8 cek), tinggi Hari 1 -575/-549/-523 px.
+- **Konfirmasi Amal:** kutipan "Setuju semua 10" (chat PIC, 25 Okt) tercatat PIC di git; Auditor tidak melihat chat PIC, jadi **Amal diminta menegaskannya** di chat Auditor. Isinya sesuai syarat butir 2 (daftar id dan dampak ditampilkan lebih dulu).
+- **Status 24 pertanyaan:** Hapus 10 **selesai**; Sederhanakan 7 **selesai** (Tahap A); Pertahankan 7 tidak diubah. Pertanyaan Kenali Calon yang masih mengulang CV: tidak ada selain potongan yang disengaja pada 7 yang disederhanakan.
+- **Belum dibuktikan:** tampilan di perangkat nyata (aturan 11); jumlah pengguna yang punya jawaban lama pada 10 id pensiun (tanpa analitik). Jawaban itu dibiarkan di `localStorage` dan tidak ikut "Salin jawaban".
