@@ -257,3 +257,14 @@ Penanda: **[Diperiksa Auditor]** dijalankan Auditor sendiri dari git/API; **[Lap
 - **Konfirmasi Amal:** kutipan "Setuju semua 10" (chat PIC, 25 Okt) tercatat PIC di git; Auditor tidak melihat chat PIC, jadi Amal diminta menegaskannya. **[Amal, chat Auditor, 25 Okt 2026]** "Iya saya setujui semua 10 itu" (menegaskan; konfirmasi yang sah menurut butir 2 tetap yang di chat PIC). Isinya sesuai syarat butir 2 (daftar id dan dampak ditampilkan lebih dulu). Tidak ada tindak lanjut.
 - **Status 24 pertanyaan:** Hapus 10 **selesai**; Sederhanakan 7 **selesai** (Tahap A); Pertahankan 7 tidak diubah. Pertanyaan Kenali Calon yang masih mengulang CV: tidak ada selain potongan yang disengaja pada 7 yang disederhanakan.
 - **Belum dibuktikan:** tampilan di perangkat nyata (aturan 11); jumlah pengguna yang punya jawaban lama pada 10 id pensiun (tanpa analitik). Jawaban itu dibiarkan di `localStorage` dan tidak ikut "Salin jawaban".
+
+### 10.1 Uji independen Auditor atas jawaban lama (28 Okt 2026)
+
+**[Diperiksa Auditor]** Chromium, server lokal, jaringan luar diblokir; `localStorage` diisi canary untuk 10 id pensiun dan teks penanda untuk 5 id yang tetap ada (d1q1, d1q22, d2q11, d3q20, d5q15), lalu sesi Hari 1, 2, 3, 5 dibuka dan "Salin jawaban sesi ini" ditekan:
+
+- id pensiun tidak dirender (0 dari 10) dan tidak ada canary di layar maupun di hasil salinan;
+- 5 jawaban id yang tetap ada tampil dan ikut tersalin (5 dari 5);
+- 15 kunci jawaban tetap di `localStorage` (10 pensiun + 5), jadi tidak ada pembersihan otomatis; "Hapus semua jawaban" mengosongkannya;
+- 0 galat halaman, 0 host luar.
+
+Ini mengonfirmasi perilaku yang dilaporkan PIC. (Catatan: dalam laporan chat Auditor 25 Okt sempat tertulis dugaan bahwa jawaban lama pada id pensiun masih tampil; itu tidak berdasar, tidak diuji saat ditulis, dan salah menurut uji ini.)
